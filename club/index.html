@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Quacking Pawn</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'duck-bg-dark': '#1A202C',      // Dark slate gray, like deep pond water
+                        'duck-bg-medium': '#2D3748',    // Darker grayish blue for sections
+                        'duck-accent-yellow': '#FACC15', // Bright yellow for duck bill/feet, main accent
+                        'duck-accent-green': '#4CAF50',  // Medium green for reeds/grass
+                        'duck-text-light': '#F7FAFC',   // Near white for text
+                        'duck-border': '#4A5568',       // Subtle blue-gray border
+                        'duck-highlight': '#E5B300',    // Darker yellow for hover
+                        'duck-water-blue': '#4299E1',   // Vibrant blue for water elements
+                    },
+                    fontFamily: {
+                        // Keeping Inter for general text as it's readable and fits instructions
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Apply the Inter font globally */
+        body {
+            font-family: 'Inter', sans-serif;
+            /* Ensure the body can scroll if content overflows */
+            overflow-y: auto;
+        }
+        /* Custom scrollbar for consistency with the dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #2D3748; /* Darker track */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4A5568; /* Scrollbar thumb color */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #60A5FA; /* Slightly blue hover for scrollbar */
+        }
+
+        /* Water Background Animation */
+        .water-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1A202C, #2D3748, #4299E1); /* Blend of dark and water blue */
+            background-size: 400% 400%;
+            animation: waterFlow 15s ease infinite alternate; /* Slower, smoother animation */
+            z-index: -1; /* Send to back */
+            opacity: 0.7; /* Slightly transparent */
+        }
+
+        @keyframes waterFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* Card hover effects */
+        .card-hover-effect {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+        .card-hover-effect:hover {
+            transform: translateY(-5px); /* Lift effect */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
+        }
+
+        /* Quack button animation */
+        @keyframes quackPop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .quack-button.clicked {
+            animation: quackPop 0.3s ease-out;
+        }
+
+        /* Loading spinner animation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #FACC15; /* Duck yellow */
+            width: 24px;
+            height: 24px;
+            -webkit-animation: spin 1s linear infinite; /* Safari */
+            animation: spin 1s linear infinite;
+        }
+
+        /* Safari */
+        @-webkit-keyframes spin {
+            0% { -webkit-transform: rotate(0deg); }
+            100% { -webkit-transform: rotate(360deg); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom Modal styles for messages instead of alert() */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #2D3748;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+        }
+        .modal-title {
+            color: #FACC15;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .modal-message {
+            color: #F7FAFC;
+            margin-bottom: 1.5rem;
+        }
+        .modal-close-button {
+            background-color: #FACC15;
+            color: #1A202C;
+            font-weight: bold;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .modal-close-button:hover {
+            background-color: #E5B300;
+        }
+    </style>
+</head>
+<body class="bg-duck-bg-dark text-duck-text-light min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 relative">
+
+    <!-- Animated Water Background Layer -->
+    <div class="water-bg"></div>
+
+    <!-- Header Section -->
+    <header class="w-full max-w-4xl bg-duck-bg-medium rounded-2xl shadow-xl mb-8 p-6 flex flex-col sm:flex-row justify-between items-center border border-duck-border relative z-10 card-hover-effect">
+        <div class="text-center sm:text-left mb-4 sm:mb-0">
+            
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-duck-accent-yellow flex items-center justify-center sm:justify-start">
+                <span class="text-4xl sm:text-5xl mr-2">🦆</span> The Quacking Pawn Chess Club
+            </h1>
+            <p class="text-lg text-duck-text-light mt-1">Waddling to Victory!</p>
+        </div>
+        <nav>
+            <ul class="flex flex-wrap justify-center sm:justify-end space-x-4 sm:space-x-6 text-lg">
+                <li>
+                    
+                    <a href="https://www.chess.com/club/the-quacking-pawn" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center px-4 py-2 bg-duck-accent-yellow text-duck-bg-dark font-bold rounded-xl shadow-md
+                              hover:bg-duck-highlight transition-all duration-300 transform hover:scale-105 text-base" style="padding-left: 23px; padding-right: 23px;">
+                        Join Our Club!
+                        
+                        <svg class="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path></svg>
+                    </a>
+                </li>
+                <li>
+                    
+                    <a href="https://www.chess.com/club/the-quacking-pawn" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center px-4 py-2 bg-duck-accent-yellow text-duck-bg-dark font-bold rounded-xl shadow-md
+                              hover:bg-duck-highlight transition-all duration-300 transform hover:scale-105 text-base">
+                        Join Our Server!
+                        
+                        <svg class="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path></svg>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+
+        <!-- About Us Section -->
+        <section id="about" class="bg-duck-bg-medium rounded-2xl shadow-xl p-6 border border-duck-border card-hover-effect">
+            <h2 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">About Our Pond</h2>
+            <p class="text-duck-text-light leading-relaxed mb-4">
+                Welcome to <span class="font-bold">The Quacking Pawn</span>! We're a vibrant community of chess enthusiasts on Chess.com, offering a friendly environment for players of all skill levels. Sharpen your tactics, join thrilling tournaments, and dive into insightful strategy discussions. Let's make some waves together!
+            </p>
+            <a href="https://www.chess.com/club/the-quacking-pawn" target="_blank" rel="noopener noreferrer"
+               class="mt-4 inline-block text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm">
+                Visit our Chess.com Nest &rarr;
+            </a>
+        </section>
+
+        <!-- Upcoming Events Section -->
+        <section id="events" class="bg-duck-bg-medium rounded-2xl shadow-xl p-6 border border-duck-border card-hover-effect">
+            <h2 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">Upcoming Pond Events</h2>
+            <ul class="space-y-4">
+                <li class="border-b border-duck-border pb-4 last:border-b-0">
+                    <h3 class="text-lg font-bold text-duck-text-light">Nothing planed yet</h3>
+                    <p class="text-sm text-gray-400"></p>
+                    <p class="text-duck-text-light mt-1">Stay tuned for updates!</p>
+                    <a href="https://www.chess.com/club/the-quacking-pawn" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm mt-2 inline-block">Join Our Club!</a>
+                </li>
+
+<!--
+
+                <li class="border-b border-duck-border pb-4 last:border-b-0">
+                    <h3 class="text-lg font-bold text-duck-text-light">Pond Patrol Championship Round 3</h3>
+                    <p class="text-sm text-gray-400">Starts: July 10, 2025 (Long games, big splashes!)</p>
+                    <p class="text-duck-text-light mt-1">Our ongoing championship to crown the top duck. Are you ready to ruffle some feathers?</p>
+                    <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm mt-2 inline-block">See the Pecking Order</a>
+                </li>
+                <li>
+                    <h3 class="text-lg font-bold text-duck-text-light">Duckling's First Flight Lesson: Tactics!</h3>
+                    <p class="text-sm text-gray-400">July 15, 2025, 6:00 PM EST (via Pond-side Chat)</p>
+                    <p class="text-duck-text-light mt-1">Learn essential chess tactics from our wise old owl... uh, duck! Perfect for little ducklings.</p>
+                    <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm mt-2 inline-block">Waddle In!</a>
+                </li>
+
+-->
+
+            </ul>
+
+            <!-- LLM Duck Joke Generator Section -->
+            <div class="mt-8 pt-6 border-t border-duck-border">
+                <h3 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">😂 Duck Joke Generator</h3>
+                <p class="text-duck-text-light mb-4">
+                    Need a laugh? Let our AI tell you a funny duck-themed joke!
+                </p>
+                <button id="generateJokeBtn"
+                        class="mt-4 inline-flex items-center px-6 py-3 bg-duck-accent-yellow text-duck-bg-dark font-bold rounded-xl shadow-lg
+                               hover:bg-duck-highlight transition-all duration-300 transform hover:scale-105 text-base"
+                        disabled> <!-- Initially disabled until bad words list loads -->
+                    Tell Me a Duck Joke!
+                    <span id="loadingSpinner" class="spinner ml-3 hidden"></span>
+                </button>
+
+                <div id="jokeOutput" class="mt-6 p-4 bg-duck-bg-dark rounded-lg border border-duck-border hidden">
+                    <h4 class="text-xl font-bold text-duck-accent-green mb-2">Here's a Quacker for Ya!</h4>
+                    <p class="text-duck-text-light" id="outputJoke"></p>
+                </div>
+                <div id="errorMessage" class="mt-4 p-3 bg-red-600 text-white rounded-lg hidden">
+                    Oops! Something went wrong while hatching a joke. Please try again!
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Results Section -->
+        <section id="results" class="md:col-span-2 bg-duck-bg-medium rounded-2xl shadow-xl p-6 border border-duck-border card-hover-effect">
+            <h2 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">Recent Feathered Feats & Highlights</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-duck-border">
+                    <thead class="bg-duck-bg-dark">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider rounded-tl-md">Event</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Top Duck</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date of Splash</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider rounded-tr-md">Pond Report</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-duck-border">
+                        
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Nothing</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Here Yet</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">June 26, 2025</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200">Quack!</a>
+                            </td>
+                        </tr>
+                        
+                        <!--
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Team Dive vs. Gander Gang</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">The Quacking Chess Club (54 - 46)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">June 15, 2025</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200">Full Flock Report</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Bullet Honk #10</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Duckenstein</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">June 10, 2025</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200">Top Waddlers</a>
+                            </td>
+                        </tr>
+                        -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="w-full max-w-4xl bg-duck-bg-medium rounded-2xl shadow-xl mt-8 p-6 text-center text-sm text-gray-400 border border-duck-border relative z-10 card-hover-effect">
+        <p>&copy; 2025 The Quacking Pawn</p>
+        <div class="mt-2 flex justify-center space-x-4">
+    
+        </div>
+    </footer>
+
+    <!-- Floating Quack Button -->
+    <button id="quackButton" class="fixed bottom-6 right-6 bg-duck-accent-yellow text-duck-bg-dark font-bold py-3 px-6 rounded-full shadow-lg
+                                   hover:bg-duck-highlight transition-all duration-300 transform hover:scale-110
+                                   flex items-center justify-center text-lg z-20 quack-button">
+        <span class="mr-2">📢</span> Quack!
+    </button>
+
+    <!-- Custom Modal for messages -->
+    <div id="customModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle"></h3>
+            <p class="modal-message" id="modalMessage"></p>
+            <button class="modal-close-button" id="modalCloseButton">Got it!</button>
+        </div>
+    </div>
+
+    <script>
+        // JavaScript for the Quack button animation
+        document.getElementById('quackButton').addEventListener('click', function() {
+            this.classList.add('clicked');
+            // Remove the class after the animation finishes to allow re-triggering
+            this.addEventListener('animationend', () => {
+                this.classList.remove('clicked');
+            }, { once: true });
+        });
+
+  
+        const pondSecretPart1 = "AIzaS";
+        const waddleCodePart2 = "yDdJ_";
+        const featherKeyPart3 = "vKPpo";
+        const splashTokenPart4 = "_51wD";
+        const webfootAuthPart5 = "6aCtE";
+        const chirpAccessPart6 = "GCnD-";
+        const flightPathCredPart7 = "3LSGM";
+        const duckyGuardPart8 = "RaJY";
+
+        function combineApiKey() {
+            return pondSecretPart1 + waddleCodePart2 + featherKeyPart3 + splashTokenPart4 +
+                   webfootAuthPart5 + chirpAccessPart6 + flightPathCredPart7 + duckyGuardPart8;
+        }
+
+
+        let badWords = [];
+        let badWordsLoaded = false; // Flag to indicate if the list is loaded
+
+        // JavaScript for the LLM Duck Joke Generator
+        const generateJokeBtn = document.getElementById('generateJokeBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const jokeOutput = document.getElementById('jokeOutput');
+        const outputJoke = document.getElementById('outputJoke');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Custom Modal elements
+        const customModal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalCloseButton = document.getElementById('modalCloseButton');
+
+        // Function to display custom modal
+        function showCustomModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            customModal.classList.remove('hidden');
+        }
+
+        // Event listener for closing the modal
+        modalCloseButton.addEventListener('click', () => {
+            customModal.classList.add('hidden');
+        });
+
+        
+        function containsBadWords(text) {
+            if (!badWordsLoaded) {
+                console.warn("Bad words list not loaded. Content filtering might be incomplete.");
+                // If the list couldn't load, we might choose to still let the joke through
+                // or display a more persistent warning/disable the feature.
+                // For now, we'll proceed but log a warning.
+                return false; 
+            }
+            const lowerCaseText = text.toLowerCase();
+            // Iterate over each word in the badWords array
+            for (const word of badWords) {
+                // Check if the lowercase text contains the lowercase bad word
+                // Using a regular expression with word boundaries to avoid partial matches (e.g., "ass" in "class")
+                const regex = new RegExp(`\\b${word}\\b`, 'gi'); // 'gi' for global and case-insensitive
+                if (regex.test(lowerCaseText)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Function to load the bad words list from the JSON file
+        async function loadBadWordsList() {
+            try {
+               
+                const response = await fetch('words.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                // Assuming 'words.json' is a direct array of strings
+                badWords = data.map(word => word.toLowerCase());
+                
+                badWordsLoaded = true;
+                generateJokeBtn.disabled = false; // Enable the joke button
+                console.log("Bad words list loaded successfully. Total words:", badWords.length);
+            } catch (error) {
+                console.error("Failed to load bad words list:", error);
+                showCustomModal("Filter Warning: Quack!", "Couldn't load the bad word filter from your provided file. Jokes might be less filtered than intended. Please ensure the 'words.json' file is in the same directory as this HTML file.");
+                generateJokeBtn.disabled = false; // Still enable the button for functionality, with warning
+            }
+        }
+
+        // Call this function when the DOM is fully loaded to load the filter list
+        document.addEventListener('DOMContentLoaded', () => {
+            generateJokeBtn.disabled = true; // Initially disable the button
+            loadBadWordsList();
+        });
+
+
+        generateJokeBtn.addEventListener('click', async () => {
+            loadingSpinner.classList.remove('hidden');
+            generateJokeBtn.disabled = true; // Disable button while loading
+            jokeOutput.classList.add('hidden'); // Hide previous output
+            errorMessage.classList.add('hidden'); // Hide previous errors
+
+            try {
+                
+                const apiKey = combineApiKey(); 
+
+                let chatHistory = [];
+                chatHistory.push({
+                    role: "user",
+                    parts: [{
+                        text: `Tell me a single, funny, duck-themed joke. Provide the joke as a plain string, directly in the response.`
+                    }]
+                });
+
+                const payload = {
+                    contents: chatHistory,
+                    generationConfig: {
+                        responseMimeType: "text/plain" // Requesting plain text for a simple joke
+                    }
+                };
+
+                
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log(result); // Log the full result for debugging
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    let jokeText = result.candidates[0].content.parts[0].text;
+
+                    // --- Apply bad word filter ---
+                    if (containsBadWords(jokeText)) {
+                        outputJoke.textContent = "Oops! That joke was a bit too quacky for our pond and has been filtered for family-friendly fun. Try another one!";
+                        showCustomModal("Content Filtered!", "A joke containing potentially inappropriate language was detected and replaced. Please try generating another joke!");
+                    } else {
+                        outputJoke.textContent = jokeText.trim(); // Display the joke
+                    }
+                    // --- End of filter application ---
+
+                    jokeOutput.classList.remove('hidden');
+                } else {
+                    errorMessage.textContent = "Could not hatch a joke. Response structure unexpected.";
+                    errorMessage.classList.remove('hidden');
+                }
+
+            } catch (error) {
+                console.error("Error generating joke:", error);
+                errorMessage.textContent = `Error: ${error.message}. Please try again.`;
+            } finally {
+                loadingSpinner.classList.add('hidden');
+                generateJokeBtn.disabled = false; // Re-enable button
+            }
+        });
+    </script>
+
+</body>
+</html>
