@@ -341,16 +341,13 @@
     </div>
 
     <script>
-        // JavaScript for the Quack button animation
         document.getElementById('quackButton').addEventListener('click', function() {
             this.classList.add('clicked');
-            // Remove the class after the animation finishes to allow re-triggering
             this.addEventListener('animationend', () => {
                 this.classList.remove('clicked');
             }, { once: true });
         });
 
-  
         const pondSecretPart1 = "AIzaS";
         const waddleCodePart2 = "yDdJ_";
         const featherKeyPart3 = "vKPpo";
@@ -365,50 +362,38 @@
                    webfootAuthPart5 + chirpAccessPart6 + flightPathCredPart7 + duckyGuardPart8;
         }
 
-
         let badWords = [];
-        let badWordsLoaded = false; // Flag to indicate if the list is loaded
+        let badWordsLoaded = false;
 
-        // JavaScript for the LLM Duck Joke Generator
         const generateJokeBtn = document.getElementById('generateJokeBtn');
         const loadingSpinner = document.getElementById('loadingSpinner');
         const jokeOutput = document.getElementById('jokeOutput');
         const outputJoke = document.getElementById('outputJoke');
         const errorMessage = document.getElementById('errorMessage');
 
-        // Custom Modal elements
         const customModal = document.getElementById('customModal');
         const modalTitle = document.getElementById('modalTitle');
         const modalMessage = document.getElementById('modalMessage');
         const modalCloseButton = document.getElementById('modalCloseButton');
 
-        // Function to display custom modal
         function showCustomModal(title, message) {
             modalTitle.textContent = title;
             modalMessage.textContent = message;
             customModal.classList.remove('hidden');
         }
 
-        // Event listener for closing the modal
         modalCloseButton.addEventListener('click', () => {
             customModal.classList.add('hidden');
         });
 
-        
         function containsBadWords(text) {
             if (!badWordsLoaded) {
                 console.warn("Bad words list not loaded. Content filtering might be incomplete.");
-                // If the list couldn't load, we might choose to still let the joke through
-                // or display a more persistent warning/disable the feature.
-                // For now, we'll proceed but log a warning.
                 return false; 
             }
             const lowerCaseText = text.toLowerCase();
-            // Iterate over each word in the badWords array
             for (const word of badWords) {
-                // Check if the lowercase text contains the lowercase bad word
-                // Using a regular expression with word boundaries to avoid partial matches (e.g., "ass" in "class")
-                const regex = new RegExp(`\\b${word}\\b`, 'gi'); // 'gi' for global and case-insensitive
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
                 if (regex.test(lowerCaseText)) {
                     return true;
                 }
@@ -416,62 +401,57 @@
             return false;
         }
 
-        // Function to load the bad words list from the JSON file
         async function loadBadWordsList() {
             try {
-               
-                const response = await fetch('words.json');
+                // IMPORTANT: Removed content_fetcher.fetch as it's not available in the browser.
+                // Using standard fetch API for local file access.
+                const response = await fetch('./words.json');
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`HTTP error! status: ${response.status} when fetching words.json. Ensure it's in the same directory as this HTML.`);
                 }
                 const data = await response.json();
 
-                // Assuming 'words.json' is a direct array of strings
                 badWords = data.map(word => word.toLowerCase());
                 
                 badWordsLoaded = true;
-                generateJokeBtn.disabled = false; // Enable the joke button
+                generateJokeBtn.disabled = false;
                 console.log("Bad words list loaded successfully. Total words:", badWords.length);
             } catch (error) {
                 console.error("Failed to load bad words list:", error);
-                showCustomModal("Filter Warning: Quack!", "Couldn't load the bad word filter from your provided file. Jokes might be less filtered than intended. Please ensure the 'words.json' file is in the same directory as this HTML file.");
-                generateJokeBtn.disabled = false; // Still enable the button for functionality, with warning
+                showCustomModal("Filter Warning: Quack!", "Couldn't load the bad word filter. Please ensure 'words.json' is in the same directory as this HTML file when deployed, or check your local server setup.");
+                generateJokeBtn.disabled = false;
             }
         }
 
-        // Call this function when the DOM is fully loaded to load the filter list
         document.addEventListener('DOMContentLoaded', () => {
-            generateJokeBtn.disabled = true; // Initially disable the button
+            generateJokeBtn.disabled = true;
             loadBadWordsList();
         });
 
-
         generateJokeBtn.addEventListener('click', async () => {
             loadingSpinner.classList.remove('hidden');
-            generateJokeBtn.disabled = true; // Disable button while loading
-            jokeOutput.classList.add('hidden'); // Hide previous output
-            errorMessage.classList.add('hidden'); // Hide previous errors
+            generateJokeBtn.disabled = true;
+            jokeOutput.classList.add('hidden');
+            errorMessage.classList.add('hidden');
 
             try {
-                
-                const apiKey = combineApiKey(); 
+                const apiKey = combineApiKey();
 
                 let chatHistory = [];
                 chatHistory.push({
                     role: "user",
                     parts: [{
-                        text: `Tell me a single, funny, duck-themed joke. Provide the joke as a plain string, directly in the response.`
+                        text: `Tell me a single, funny, unique duck-themed joke. Make sure it's different from previous jokes you might have told. Provide the joke as a plain string, directly in the response.`
                     }]
                 });
 
                 const payload = {
                     contents: chatHistory,
                     generationConfig: {
-                        responseMimeType: "text/plain" // Requesting plain text for a simple joke
+                        responseMimeType: "text/plain"
                     }
                 };
 
-                
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
                 const response = await fetch(apiUrl, {
@@ -485,21 +465,19 @@
                 }
 
                 const result = await response.json();
-                console.log(result); // Log the full result for debugging
+                console.log(result);
 
                 if (result.candidates && result.candidates.length > 0 &&
                     result.candidates[0].content && result.candidates[0].content.parts &&
                     result.candidates[0].content.parts.length > 0) {
                     let jokeText = result.candidates[0].content.parts[0].text;
 
-                    // --- Apply bad word filter ---
                     if (containsBadWords(jokeText)) {
                         outputJoke.textContent = "Oops! That joke was a bit too quacky for our pond and has been filtered for family-friendly fun. Try another one!";
                         showCustomModal("Content Filtered!", "A joke containing potentially inappropriate language was detected and replaced. Please try generating another joke!");
                     } else {
-                        outputJoke.textContent = jokeText.trim(); // Display the joke
+                        outputJoke.textContent = jokeText.trim();
                     }
-                    // --- End of filter application ---
 
                     jokeOutput.classList.remove('hidden');
                 } else {
@@ -512,7 +490,7 @@
                 errorMessage.textContent = `Error: ${error.message}. Please try again.`;
             } finally {
                 loadingSpinner.classList.add('hidden');
-                generateJokeBtn.disabled = false; // Re-enable button
+                generateJokeBtn.disabled = false;
             }
         });
     </script>
