@@ -3,83 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Quacking Pawn</title>
-    
+    <title>Pondside Pixels</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'duck-bg-dark': '#1A202C',      // Dark slate gray, like deep pond water
-                        'duck-bg-medium': '#2D3748',    // Darker grayish blue for sections
-                        'duck-accent-yellow': '#FACC15', // Bright yellow for duck bill/feet, main accent
-                        'duck-accent-green': '#4CAF50',  // Medium green for reeds/grass
-                        'duck-text-light': '#F7FAFC',   // Near white for text
-                        'duck-border': '#4A5568',       // Subtle blue-gray border
-                        'duck-highlight': '#E5B300',    // Darker yellow for hover
-                        'duck-water-blue': '#4299E1',   // Vibrant blue for water elements
+                        'pixel-dark-blue': '#222831',
+                        'pixel-medium-blue': '#393E46',
+                        'pixel-green': '#00FF00',
+                        'pixel-yellow': '#FFFF00',
+                        'pixel-red': '#FF0000',
+                        'pixel-light-gray': '#EEEEEE',
+                        'pixel-border-gray': '#555555',
                     },
                     fontFamily: {
-                        // Keeping Inter for general text as it's readable and fits instructions
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['"Press Start 2P"', 'cursive'],
                     }
                 }
             }
         }
     </script>
     <style>
-        /* Apply the Inter font globally */
         body {
-            font-family: 'Inter', sans-serif;
-            /* Ensure the body can scroll if content overflows */
+            font-family: 'Press Start 2P', cursive;
             overflow-y: auto;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
         }
-        /* Custom scrollbar for consistency with the dark theme */
         ::-webkit-scrollbar {
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #2D3748; /* Darker track */
+            background: #222831;
         }
         ::-webkit-scrollbar-thumb {
-            background: #4A5568; /* Scrollbar thumb color */
-            border-radius: 4px;
+            background: #00FF00;
+            border-radius: 2px;
+            border: 1px solid #FFFF00;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #60A5FA; /* Slightly blue hover for scrollbar */
+            background: #FFFF00;
         }
 
-        /* Water Background Animation */
         .water-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, #1A202C, #2D3748, #4299E1); /* Blend of dark and water blue */
-            background-size: 400% 400%;
-            animation: waterFlow 15s ease infinite alternate; /* Slower, smoother animation */
-            z-index: -1; /* Send to back */
-            opacity: 0.7; /* Slightly transparent */
+            background: repeating-linear-gradient(
+                45deg,
+                #393E46,
+                #393E46 10px,
+                #222831 10px,
+                #222831 20px
+            );
+            background-size: 20px 20px;
+            animation: none;
+            z-index: -1;
+            opacity: 0.9;
         }
 
-        @keyframes waterFlow {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
-
-        /* Card hover effects */
         .card-hover-effect {
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+            border-radius: 0.5rem;
         }
         .card-hover-effect:hover {
-            transform: translateY(-5px); /* Lift effect */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
+            transform: translate(-3px, -3px);
+            box-shadow: 6px 6px 0px 0px #00FF00;
         }
 
-        /* Quack button animation */
         @keyframes quackPop {
             0% { transform: scale(1); }
             50% { transform: scale(1.1); }
@@ -90,18 +87,16 @@
             animation: quackPop 0.3s ease-out;
         }
 
-        /* Loading spinner animation */
         .spinner {
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top: 4px solid #FACC15; /* Duck yellow */
+            border-top: 4px solid #FFFF00;
             width: 24px;
             height: 24px;
-            -webkit-animation: spin 1s linear infinite; /* Safari */
+            -webkit-animation: spin 1s linear infinite;
             animation: spin 1s linear infinite;
         }
 
-        /* Safari */
         @-webkit-keyframes spin {
             0% { -webkit-transform: rotate(0deg); }
             100% { -webkit-transform: rotate(360deg); }
@@ -112,85 +107,95 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Custom Modal styles for messages instead of alert() */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
+            background-color: rgba(0, 0, 0, 0.8);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
         }
         .modal-content {
-            background-color: #2D3748;
+            background-color: #222831;
             padding: 2rem;
-            border-radius: 0.75rem;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            border-radius: 0.25rem;
+            box-shadow: 4px 4px 0px 0px #00FF00;
             max-width: 90%;
             width: 400px;
             text-align: center;
+            border: 2px solid #FFFF00;
         }
         .modal-title {
-            color: #FACC15;
+            color: #FFFF00;
             font-size: 1.5rem;
             font-weight: bold;
             margin-bottom: 1rem;
         }
         .modal-message {
-            color: #F7FAFC;
+            color: #00FF00;
             margin-bottom: 1.5rem;
         }
         .modal-close-button {
-            background-color: #FACC15;
-            color: #1A202C;
+            background-color: #00FF00;
+            color: #222831;
             font-weight: bold;
             padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
+            border-radius: 0.25rem;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.1s;
+            border: 2px solid #FFFF00;
+            box-shadow: 2px 2px 0px 0px #FFFF00;
         }
         .modal-close-button:hover {
-            background-color: #E5B300;
+            background-color: #FFFF00;
+            color: #222831;
+            box-shadow: 2px 2px 0px 0px #00FF00;
+        }
+
+        .pixel-button {
+            background-color: #00FF00;
+            color: #222831;
+            font-weight: bold;
+            border-radius: 0.25rem;
+            box-shadow: 2px 2px 0px 0px #FFFF00;
+            transition: all 0.1s;
+            border: 2px solid #FFFF00;
+        }
+        .pixel-button:hover {
+            background-color: #FFFF00;
+            color: #222831;
+            box-shadow: 2px 2px 0px 0px #00FF00;
         }
     </style>
 </head>
-<body class="bg-duck-bg-dark text-duck-text-light min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 relative">
+<body class="bg-pixel-dark-blue text-pixel-light-gray min-h-screen flex flex-col items-center p-4 sm:p-6 lg:p-8 relative">
 
-    <!-- Animated Water Background Layer -->
     <div class="water-bg"></div>
 
-    <!-- Header Section -->
-    <header class="w-full max-w-4xl bg-duck-bg-medium rounded-2xl shadow-xl mb-8 p-6 flex flex-col sm:flex-row justify-between items-center border border-duck-border relative z-10 card-hover-effect">
+    <header class="w-full max-w-4xl bg-pixel-medium-blue rounded-lg shadow-xl mb-8 p-6 flex flex-col sm:flex-row justify-between items-center border-2 border-pixel-border-gray relative z-10 card-hover-effect">
         <div class="text-center sm:text-left mb-4 sm:mb-0">
-            
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-duck-accent-yellow flex items-center justify-center sm:justify-start">
-                <span class="text-4xl sm:text-5xl mr-2">🦆</span> The Quacking Pawn Chess Club
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-pixel-green flex items-center justify-center sm:justify-start">
+                <span class="text-4xl sm:text-5xl mr-2">♙</span> Pondside Pixels
             </h1>
-            
+            <p class="text-sm text-pixel-yellow mt-1">Chess in a retro byte!</p>
         </div>
         <nav>
             <ul class="flex flex-wrap justify-center sm:justify-end space-x-4 sm:space-x-6 text-lg">
                 <li>
-                    
                     <a href="https://www.chess.com/club/the-quacking-pawn" target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center px-4 py-2 bg-duck-accent-yellow text-duck-bg-dark font-bold rounded-xl shadow-md
-                              hover:bg-duck-highlight transition-all duration-300 transform hover:scale-105 text-base" style="padding-left: 23px; padding-right: 23px; margin-bottom: 4px;">
-                        Join Our Club!
-                        
+                       class="inline-flex items-center px-4 py-2 pixel-button" style="padding-left: 34px; padding-right: 35px; margin-bottom: 4px;">
+                        JOIN CLUB!
                         <svg class="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path></svg>
                     </a>
                 </li>
                 <li>
-                    
-                    <a href="https://discord.gg/A7eNNCJdH7" target="_blank" rel="noopener noreferrer"
-                       class="inline-flex items-center px-4 py-2 bg-duck-accent-yellow text-duck-bg-dark font-bold rounded-xl shadow-md
-                              hover:bg-duck-highlight transition-all duration-300 transform hover:scale-105 text-base">
-                        Join Our Server!
-                        
+                    <a href="https://www.chess.com/club/the-quacking-pawn" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center px-4 py-2 pixel-button">
+                        JOIN SERVER!
                         <svg class="ml-2 -mr-1 w-4 h-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path></svg>
                     </a>
                 </li>
@@ -198,117 +203,73 @@
         </nav>
     </header>
 
-    <!-- Main Content Area -->
     <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
 
-        <!-- About Us Section -->
-        <section id="about" class="bg-duck-bg-medium rounded-2xl shadow-xl p-6 border border-duck-border card-hover-effect">
-            <h2 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">About Our Pond</h2>
-            <p class="text-duck-text-light leading-relaxed mb-4">
-                Welcome to <span class="font-bold">The Quacking Pawn</span>! We're a vibrant community of chess enthusiasts on Chess.com, offering a friendly environment for players of all skill levels. Sharpen your tactics, join thrilling tournaments, and dive into insightful strategy discussions. Let's make some waves together!
+        <section id="about" class="bg-pixel-medium-blue rounded-lg shadow-xl p-6 border-2 border-pixel-border-gray card-hover-effect">
+            <h2 class="text-2xl font-extrabold text-pixel-yellow mb-4">ABOUT OUR POND</h2>
+            <p class="text-pixel-light-gray leading-relaxed mb-4">
+                Welcome to <span class="font-bold">Pondside Pixels</span>! We're a vibrant community of chess enthusiasts on Chess.com, offering a friendly environment for players of all skill levels. Sharpen your tactics, join thrilling tournaments, and dive into insightful strategy discussions. Let's make some waves together!
             </p>
             <a href="https://www.chess.com/club/the-quacking-pawn" target="_blank" rel="noopener noreferrer"
-               class="mt-4 inline-block text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm">
+               class="mt-4 inline-block text-pixel-green hover:text-pixel-yellow transition-colors duration-200 text-sm">
                 Visit our Chess.com Nest &rarr;
             </a>
         </section>
 
-        <!-- Upcoming Events Section -->
-        <section id="events" class="bg-duck-bg-medium rounded-2xl shadow-xl p-6 border border-duck-border card-hover-effect">
-            <h2 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">Upcoming Pond Events</h2>
+        <section id="events" class="bg-pixel-medium-blue rounded-lg shadow-xl p-6 border-2 border-pixel-border-gray card-hover-effect">
+            <h2 class="text-2xl font-extrabold text-pixel-yellow mb-4">UPCOMING PIXEL EVENTS</h2>
             <ul class="space-y-4">
-                <li class="border-b border-duck-border pb-4 last:border-b-0">
-                    <h3 class="text-lg font-bold text-duck-text-light">Nothing planed yet</h3>
-                    <p class="text-sm text-gray-400"></p>
-                    <p class="text-duck-text-light mt-1">Stay tuned for updates!</p>
-                    <a href="https://www.chess.com/club/the-quacking-pawn" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm mt-2 inline-block">Join Our Club!</a>
+                <li class="border-b-2 border-pixel-border-gray pb-4 last:border-b-0">
+                    <h3 class="text-lg font-bold text-pixel-light-gray">Nothing planned yet</h3>
+                    <p class="text-sm text-pixel-border-gray"></p>
+                    <p class="text-pixel-light-gray mt-1">Stay tuned for updates!</p>
+                    <a href="https://www.chess.com/club/the-quacking-pawn" class="text-pixel-green hover:text-pixel-yellow transition-colors duration-200 text-sm mt-2 inline-block">Join Our Club!</a>
                 </li>
-
-<!--
-
-                <li class="border-b border-duck-border pb-4 last:border-b-0">
-                    <h3 class="text-lg font-bold text-duck-text-light">Pond Patrol Championship Round 3</h3>
-                    <p class="text-sm text-gray-400">Starts: July 10, 2025 (Long games, big splashes!)</p>
-                    <p class="text-duck-text-light mt-1">Our ongoing championship to crown the top duck. Are you ready to ruffle some feathers?</p>
-                    <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm mt-2 inline-block">See the Pecking Order</a>
-                </li>
-                <li>
-                    <h3 class="text-lg font-bold text-duck-text-light">Duckling's First Flight Lesson: Tactics!</h3>
-                    <p class="text-sm text-gray-400">July 15, 2025, 6:00 PM EST (via Pond-side Chat)</p>
-                    <p class="text-duck-text-light mt-1">Learn essential chess tactics from our wise old owl... uh, duck! Perfect for little ducklings.</p>
-                    <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200 text-sm mt-2 inline-block">Waddle In!</a>
-                </li>
-
--->
-
             </ul>
 
-            <!-- LLM Duck Joke Generator Section -->
-            <div class="mt-8 pt-6 border-t border-duck-border">
-                <h3 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">😂 Duck Joke Generator</h3>
-                <p class="text-duck-text-light mb-4">
+            <div class="mt-8 pt-6 border-t-2 border-pixel-border-gray">
+                <h3 class="text-2xl font-extrabold text-pixel-yellow mb-4">🦆 DUCK JOKE GEN</h3>
+                <p class="text-pixel-light-gray mb-4">
                     Need a laugh? Let our AI tell you a funny duck-themed joke!
                 </p>
                 <button id="generateJokeBtn"
-                        class="mt-4 inline-flex items-center px-6 py-3 bg-duck-accent-yellow text-duck-bg-dark font-bold rounded-xl shadow-lg
-                               hover:bg-duck-highlight transition-all duration-300 transform hover:scale-105 text-base"
-                        disabled> <!-- Initially disabled until bad words list loads -->
-                    Tell Me a Duck Joke!
+                        class="mt-4 inline-flex items-center px-6 py-3 pixel-button"
+                        disabled>
+                    GET DUCK JOKE!
                     <span id="loadingSpinner" class="spinner ml-3 hidden"></span>
                 </button>
 
-                <div id="jokeOutput" class="mt-6 p-4 bg-duck-bg-dark rounded-lg border border-duck-border hidden">
-                    <h4 class="text-xl font-bold text-duck-accent-green mb-2">Here's a Quacker for Ya!</h4>
-                    <p class="text-duck-text-light" id="outputJoke"></p>
+                <div id="jokeOutput" class="mt-6 p-4 bg-pixel-dark-blue rounded-lg border-2 border-pixel-border-gray hidden">
+                    <h4 class="text-xl font-bold text-pixel-green mb-2">A QUACKING LAUGH!</h4>
+                    <p class="text-pixel-light-gray" id="outputJoke"></p>
                 </div>
-                <div id="errorMessage" class="mt-4 p-3 bg-red-600 text-white rounded-lg hidden">
-                    Oops! Something went wrong while hatching a joke. Please try again!
+                <div id="errorMessage" class="mt-4 p-3 bg-pixel-red text-pixel-light-gray rounded-lg hidden border-2 border-pixel-yellow">
+                    ERROR: SOMETHING ISN'T PIXELLY RIGHT!
                 </div>
             </div>
         </section>
 
-        <!-- Recent Results Section -->
-        <section id="results" class="md:col-span-2 bg-duck-bg-medium rounded-2xl shadow-xl p-6 border border-duck-border card-hover-effect">
-            <h2 class="text-2xl font-extrabold text-duck-accent-yellow mb-4">Recent Feathered Feats & Highlights</h2>
+        <section id="results" class="md:col-span-2 bg-pixel-medium-blue rounded-lg shadow-xl p-6 border-2 border-pixel-border-gray card-hover-effect">
+            <h2 class="text-2xl font-extrabold text-pixel-yellow mb-4">RECENT PIXEL FEATS</h2>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-duck-border">
-                    <thead class="bg-duck-bg-dark">
+                <table class="min-w-full border-separate" style="border-spacing: 0;">
+                    <thead class="bg-pixel-dark-blue">
                         <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider rounded-tl-md">Event</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Top Duck</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date of Splash</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider rounded-tr-md">Pond Report</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-pixel-light-gray uppercase tracking-wider border-b-2 border-pixel-border-gray border-r-2 border-pixel-border-gray">EVENT</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-pixel-light-gray uppercase tracking-wider border-b-2 border-pixel-border-gray border-r-2 border-pixel-border-gray">TOP PIXEL</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-pixel-light-gray uppercase tracking-wider border-b-2 border-pixel-border-gray border-r-2 border-pixel-border-gray">DATE</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-pixel-light-gray uppercase tracking-wider border-b-2 border-pixel-border-gray">REPORT</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-duck-border">
-                        
+                    <tbody class="divide-y-2 divide-pixel-border-gray">
                         <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Nothing</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Here Yet</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">June 26, 2025</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-pixel-light-gray border-r-2 border-pixel-border-gray">Nothing</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-pixel-light-gray border-r-2 border-pixel-border-gray">Here Yet</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-pixel-border-gray border-r-2 border-pixel-border-gray">June 26, 2025</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200">Quack!</a>
+                                <a href="#" class="text-pixel-green hover:text-pixel-yellow transition-colors duration-200">QUACK!</a>
                             </td>
                         </tr>
-                        
-                        <!--
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Team Dive vs. Gander Gang</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">The Quacking Chess Club (54 - 46)</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">June 15, 2025</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200">Full Flock Report</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Bullet Honk #10</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-duck-text-light">Duckenstein</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400">June 10, 2025</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <a href="#" class="text-duck-accent-yellow hover:text-duck-highlight transition-colors duration-200">Top Waddlers</a>
-                            </td>
-                        </tr>
-                        -->
                     </tbody>
                 </table>
             </div>
@@ -316,36 +277,38 @@
 
     </main>
 
-    <!-- Footer Section -->
-    <footer class="w-full max-w-4xl bg-duck-bg-medium rounded-2xl shadow-xl mt-8 p-6 text-center text-sm text-gray-400 border border-duck-border relative z-10 card-hover-effect">
-        <p>&copy; 2025 The Quacking Pawn</p>
+    <footer class="w-full max-w-4xl bg-pixel-medium-blue rounded-lg shadow-xl mt-8 p-6 text-center text-sm text-pixel-border-gray border-2 border-pixel-border-gray relative z-10 card-hover-effect">
+        <p>&copy; 2025 Pondside Pixels. <br>INITIATE PROTOCOL PIXEL-QUACK-ALPHA-7.</p>
         <div class="mt-2 flex justify-center space-x-4">
-    
         </div>
     </footer>
 
-    <!-- Floating Quack Button -->
-    <button id="quackButton" class="fixed bottom-6 right-6 bg-duck-accent-yellow text-duck-bg-dark font-bold py-3 px-6 rounded-full shadow-lg
-                                   hover:bg-duck-highlight transition-all duration-300 transform hover:scale-110
-                                   flex items-center justify-center text-lg z-20 quack-button">
-        <span class="mr-2">📢</span> Quack!
+    <button id="quackButton" class="fixed bottom-6 right-6 px-6 py-3 pixel-button flex items-center justify-center text-lg z-20 quack-button">
+        <span class="mr-2">📢</span> QUACK!
     </button>
 
-    <!-- Custom Modal for messages -->
+    <audio id="quackSound" preload="auto">
+        <source src="./quack.wav" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
     <div id="customModal" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 class="modal-title" id="modalTitle"></h3>
             <p class="modal-message" id="modalMessage"></p>
-            <button class="modal-close-button" id="modalCloseButton">Got it!</button>
+            <button class="modal-close-button" id="modalCloseButton">GOT IT!</button>
         </div>
     </div>
 
     <script>
+        const quackSound = document.getElementById('quackSound'); // Get the audio element
+
         document.getElementById('quackButton').addEventListener('click', function() {
             this.classList.add('clicked');
             this.addEventListener('animationend', () => {
                 this.classList.remove('clicked');
             }, { once: true });
+            quackSound.play(); // Play the quack sound
         });
 
         const pondSecretPart1 = "AIzaS";
@@ -403,8 +366,6 @@
 
         async function loadBadWordsList() {
             try {
-                // IMPORTANT: Removed content_fetcher.fetch as it's not available in the browser.
-                // Using standard fetch API for local file access.
                 const response = await fetch('./words.json');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status} when fetching words.json. Ensure it's in the same directory as this HTML.`);
@@ -494,6 +455,5 @@
             }
         });
     </script>
-
 </body>
 </html>
