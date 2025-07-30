@@ -6,23 +6,53 @@
     <title>The Ruy Lopez: A Comprehensive Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        :root {
+            --primary-gradient-start: #2563eb;
+            --primary-gradient-end: #8b5cf6;
+            --background-color: #f9fafb;
+            --text-color: #111827;
+            --card-background: #ffffff;
+            --border-color: #e5e7eb;
+            --accent-color: #3b82f6;
+        }
+
+        [data-theme="dark"] {
+            --background-color: #111827;
+            --text-color: #f9fafb;
+            --card-background: #1f2937;
+            --border-color: #374151;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
         .chess-board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
-            width: 320px;
-            height: 320px;
-            border: 2px solid #8b5cf6;
+            width: 400px;
+            height: 400px;
+            border: 3px solid var(--accent-color);
+            border-radius: 8px;
+            overflow: visible;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
         }
         
         .chess-square {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 40px;
+            font-weight: 900;
             cursor: pointer;
             position: relative;
+            transition: background-color 0.2s ease;
+            min-height: 50px;
+            min-width: 50px;
         }
         
         .chess-square.light {
@@ -35,19 +65,37 @@
         
         .chess-square.highlight {
             background-color: #ffe066 !important;
-            box-shadow: inset 0 0 0 3px #f59e0b;
+            box-shadow: inset 0 0 0 4px #f59e0b;
         }
         
         .chess-piece {
-            font-size: 28px;
+            font-size: 40px;
             line-height: 1;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            display: block;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chess-piece.white {
+            color: #ffffff;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .chess-piece.black {
+            color: #000000;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.3);
         }
         
         .move-notation {
             font-family: 'Courier New', monospace;
             font-weight: bold;
-            color: #1f2937;
-            background-color: #f3f4f6;
+            color: var(--text-color);
+            background-color: var(--border-color);
             padding: 2px 6px;
             border-radius: 4px;
         }
@@ -65,11 +113,179 @@
         .section-content.active {
             max-height: 2000px;
         }
+
+        .card-bg {
+            background-color: var(--card-background);
+            border-color: var(--border-color);
+        }
+
+        .primary-gradient {
+            background: linear-gradient(to right, var(--primary-gradient-start), var(--primary-gradient-end));
+        }
+
+        /* Settings Panel Styles */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background-color: var(--card-background);
+            border-left: 1px solid var(--border-color);
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: right 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .settings-panel.open {
+            right: 0;
+        }
+
+        .settings-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 999;
+        }
+
+        .settings-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .settings-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 1001;
+        }
+
+        .settings-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .color-preview {
+            width: 100%;
+            height: 30px;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="text-gray-900" data-theme="light">
+    <!-- Settings Button -->
+    <button class="settings-button" id="settingsBtn" title="Settings">
+        ⚙️
+    </button>
+
+    <!-- Settings Overlay -->
+    <div class="settings-overlay" id="settingsOverlay"></div>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Settings</h2>
+                <button id="closeSettings" class="text-2xl hover:text-red-500 transition-colors">×</button>
+            </div>
+
+            <!-- Dark Mode Toggle -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Theme</h3>
+                <div class="flex items-center space-x-3">
+                    <span>☀️ Light</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="darkModeToggle" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    </label>
+                    <span>🌙 Dark</span>
+                </div>
+            </div>
+
+            <!-- Color Customization -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Color Customization</h3>
+                
+                <!-- Primary Gradient -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Header Gradient Start</label>
+                    <div class="flex items-center space-x-3">
+                        <input type="color" id="gradientStart" class="color-picker" value="#2563eb">
+                        <div class="color-preview primary-gradient"></div>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Header Gradient End</label>
+                    <div class="flex items-center space-x-3">
+                        <input type="color" id="gradientEnd" class="color-picker" value="#8b5cf6">
+                        <div class="color-preview primary-gradient"></div>
+                    </div>
+                </div>
+
+                <!-- Accent Color -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">Accent Color (Buttons & Borders)</label>
+                    <div class="flex items-center space-x-3">
+                        <input type="color" id="accentColor" class="color-picker" value="#3b82f6">
+                        <div class="color-preview" style="background-color: var(--accent-color);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chess Board Customization -->
+            <div class="mb-8">
+                <h3 class="text-lg font-semibold mb-4">Chess Board</h3>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Light Squares</label>
+                    <input type="color" id="lightSquare" class="color-picker" value="#f0d9b5">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">Dark Squares</label>
+                    <input type="color" id="darkSquare" class="color-picker" value="#b58863">
+                </div>
+            </div>
+
+            <!-- Reset Button -->
+            <button id="resetColors" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition-colors">
+                Reset to Default Colors
+            </button>
+        </div>
+    </div>
+
     <!-- Header -->
-    <header class="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-12">
+    <header class="primary-gradient text-white py-12">
         <div class="container mx-auto px-4">
             <h1 class="text-4xl md:text-6xl font-bold text-center mb-4">The Ruy Lopez</h1>
             <p class="text-xl md:text-2xl text-center opacity-90">A Comprehensive Guide</p>
@@ -78,7 +294,7 @@
     </header>
 
     <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-10">
+    <nav class="card-bg shadow-md sticky top-0 z-10 border-b">
         <div class="container mx-auto px-4">
             <ul class="flex flex-wrap justify-center space-x-6 py-4">
                 <li><a href="#introduction" class="text-blue-600 hover:text-blue-800 font-medium">Introduction</a></li>
@@ -93,11 +309,11 @@
     <main class="container mx-auto px-4 py-8 max-w-6xl">
         
         <!-- Author's Note -->
-        <section class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-r-lg">
+        <section class="bg-yellow-50 border-l-4 border-yellow-400 p-6 mb-8 rounded-r-lg card-bg">
             <h2 class="text-2xl font-bold mb-4 text-yellow-800">A Note from the Author</h2>
             <p class="text-gray-700 mb-4">While I'm certainly not a chess grandmaster (yet!), this guide is born from my personal journey to understand and master these openings. I truly believe that the visual and structured approach I've used here can offer valuable insights and help other players on their own path to improvement.</p>
             
-            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mt-4">
+            <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mt-4 card-bg">
                 <h3 class="font-bold text-blue-800 mb-2">Important Note for Learners</h3>
                 <p class="text-gray-700">This guide is designed to be a foundational roadmap and visual introduction to the Ruy Lopez and its common deviations. It highlights the key structures and initial ideas you should focus on learning and recognizing. However, true mastery of these openings, and significant improvement in your chess game, will require deeper study beyond this document.</p>
             </div>
@@ -108,7 +324,7 @@
             <h2 class="text-3xl font-bold mb-6 text-center">Introduction: The Ruy Lopez - My Target Opening</h2>
             <p class="text-lg mb-6 text-center text-gray-700">My main goal is to understand and play the Ruy Lopez as White. This section shows the core moves that lead to this important opening.</p>
             
-            <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="card-bg rounded-lg shadow-lg p-6 border">
                 <h3 class="text-2xl font-bold mb-4">The Ruy Lopez Core Moves</h3>
                 
                 <div class="flex flex-col lg:flex-row items-start gap-8">
@@ -326,7 +542,6 @@
             <h2 class="text-3xl font-bold mb-6">Section 3: Main Variations Within the Ruy Lopez (After 3. Bb5!)</h2>
             <p class="text-lg mb-6 text-gray-700">These are the most common and important lines you'll encounter once the Ruy Lopez has been established (1. e4 e5 2. Nf3 Nc6 3. Bb5). Understanding these variations will allow you to navigate the middle game with confidence.</p>
             
-            <!-- Create variation sections for each Ruy Lopez variation -->
             <!-- Morphy Defense -->
             <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
                 <div class="flex justify-between items-center mb-4">
@@ -619,39 +834,37 @@
         </section>
     </main>
 
-        <!-- Support Section -->
-        <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-12 mt-16">
-            <div class="container mx-auto px-4 text-center">
-                <h2 class="text-3xl font-bold mb-6">Support The Master of Ducks</h2>
-                <div class="max-w-3xl mx-auto">
-                    <p class="text-lg mb-6 opacity-90">
-                        If you found this guide helpful and would like to support <strong>Micu Vlad-Bogdan (The Master of Ducks)</strong>, 
-                        you can follow his journey and chess content on Twitch!
-                    </p>
-                    
-                    <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 mb-6">
-                        <div class="flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
-                            </svg>
-                            <span class="text-2xl font-bold">Twitch: ereghedon</span>
-                        </div>
-                        <a href="https://www.twitch.tv/ereghedon" 
-                           target="_blank" 
-                           rel="noopener noreferrer"
-                           class="inline-block bg-purple-500 hover:bg-purple-400 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 transform hover:scale-105">
-                            Follow on Twitch
-                        </a>
+    <!-- Support Section -->
+    <section class="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-12 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Support The Master of Ducks</h2>
+            <div class="max-w-3xl mx-auto">
+                <p class="text-lg mb-6 opacity-90">
+                    If you found this guide helpful and would like to support <strong>Micu Vlad-Bogdan (The Master of Ducks)</strong>, 
+                    you can follow his journey and chess content on Twitch!
+                </p>
+                
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 mb-6">
+                    <div class="flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/>
+                        </svg>
+                        <span class="text-2xl font-bold">Twitch: ereghedon</span>
                     </div>
-<!--  
-                    <p class="text-sm opacity-80">
-                        Join the community and watch live chess gameplay, opening analysis, and more educational content!
-                    </p>
--->     
+                    <a href="https://www.twitch.tv/ereghedon" 
+                       target="_blank" 
+                       rel="noopener noreferrer"
+                       class="inline-block bg-purple-500 hover:bg-purple-400 text-white font-bold py-3 px-8 rounded-full transition-colors duration-300 transform hover:scale-105">
+                        Follow on Twitch
+                    </a>
                 </div>
+                
+                <p class="text-sm opacity-80">
+                    Join the community and watch live chess gameplay, opening analysis, and more educational content!
+                </p>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 
     <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8">
@@ -663,610 +876,748 @@
     </footer>
 
     <script>
-        // Chess piece Unicode symbols
-        const pieces = {
-            'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
-            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
-        };
+        // Chess piece solid Unicode symbols - cleaner, more filled
+const pieces = {
+    'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+    'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+};
 
-        // Starting position FEN
-        const startingFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+// Starting position FEN
+const startingFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
 
-        // Chess board class
-        class ChessBoard {
-            constructor(boardId, prevBtnId, nextBtnId, moveDisplayId, explanationId) {
-                this.boardElement = document.getElementById(boardId);
-                this.prevBtn = document.getElementById(prevBtnId);
-                this.nextBtn = document.getElementById(nextBtnId);
-                this.moveDisplay = document.getElementById(moveDisplayId);
-                this.explanationElement = document.getElementById(explanationId);
-                this.currentPosition = 0;
-                this.positions = [];
-                this.moves = [];
-                this.explanations = [];
-                
-                this.initializeBoard();
-                this.setupEventListeners();
-            }
+// Settings functionality
+class SettingsManager {
+    constructor() {
+        this.initializeElements();
+        this.loadSettings();
+        this.attachEventListeners();
+    }
 
-            initializeBoard() {
-                this.boardElement.innerHTML = '';
-                for (let rank = 8; rank >= 1; rank--) {
-                    for (let file = 1; file <= 8; file++) {
-                        const square = document.createElement('div');
-                        square.className = `chess-square ${(rank + file) % 2 === 0 ? 'dark' : 'light'}`;
-                        square.dataset.square = String.fromCharCode(96 + file) + rank;
-                        this.boardElement.appendChild(square);
-                    }
-                }
-            }
+    initializeElements() {
+        this.settingsBtn = document.getElementById('settingsBtn');
+        this.settingsPanel = document.getElementById('settingsPanel');
+        this.settingsOverlay = document.getElementById('settingsOverlay');
+        this.closeSettings = document.getElementById('closeSettings');
+        this.darkModeToggle = document.getElementById('darkModeToggle');
+        this.gradientStart = document.getElementById('gradientStart');
+        this.gradientEnd = document.getElementById('gradientEnd');
+        this.accentColor = document.getElementById('accentColor');
+        this.lightSquare = document.getElementById('lightSquare');
+        this.darkSquare = document.getElementById('darkSquare');
+        this.resetColors = document.getElementById('resetColors');
+    }
 
-            setupEventListeners() {
-                this.prevBtn.addEventListener('click', () => this.previousMove());
-                this.nextBtn.addEventListener('click', () => this.nextMove());
-            }
+    attachEventListeners() {
+        this.settingsBtn.addEventListener('click', () => this.openSettings());
+        this.closeSettings.addEventListener('click', () => this.closeSettingsPanel());
+        this.settingsOverlay.addEventListener('click', () => this.closeSettingsPanel());
+        this.darkModeToggle.addEventListener('change', (e) => this.toggleDarkMode(e.target.checked));
+        this.gradientStart.addEventListener('input', (e) => this.updateGradientStart(e.target.value));
+        this.gradientEnd.addEventListener('input', (e) => this.updateGradientEnd(e.target.value));
+        this.accentColor.addEventListener('input', (e) => this.updateAccentColor(e.target.value));
+        this.lightSquare.addEventListener('input', (e) => this.updateLightSquare(e.target.value));
+        this.darkSquare.addEventListener('input', (e) => this.updateDarkSquare(e.target.value));
+        this.resetColors.addEventListener('click', () => this.resetToDefaults());
+    }
 
-            setMoveSequence(positions, moves, explanations) {
-                this.positions = positions;
-                this.moves = moves;
-                this.explanations = explanations;
-                this.currentPosition = 0;
-                this.updateDisplay();
-            }
+    openSettings() {
+        this.settingsPanel.classList.add('open');
+        this.settingsOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 
-            updateDisplay() {
-                this.displayPosition(this.positions[this.currentPosition]);
-                this.updateButtons();
-                this.updateMoveDisplay();
-                this.updateExplanation();
-            }
+    closeSettingsPanel() {
+        this.settingsPanel.classList.remove('open');
+        this.settingsOverlay.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
 
-            displayPosition(fen) {
-                const squares = this.boardElement.querySelectorAll('.chess-square');
-                squares.forEach(square => {
-                    square.innerHTML = '';
-                    square.classList.remove('highlight');
-                });
+    toggleDarkMode(isDark) {
+        document.body.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        localStorage.setItem('darkMode', isDark);
+    }
 
-                const position = fen.split(' ')[0];
-                let squareIndex = 0;
+    updateGradientStart(color) {
+        document.documentElement.style.setProperty('--primary-gradient-start', color);
+        localStorage.setItem('gradientStart', color);
+    }
 
-                for (let rank = 8; rank >= 1; rank--) {
-                    for (let file = 1; file <= 8; file++) {
-                        const square = squares[squareIndex];
-                        squareIndex++;
-                    }
-                }
+    updateGradientEnd(color) {
+        document.documentElement.style.setProperty('--primary-gradient-end', color);
+        localStorage.setItem('gradientEnd', color);
+    }
 
-                // Parse FEN and place pieces
-                const rows = position.split('/');
-                squareIndex = 0;
+    updateAccentColor(color) {
+        document.documentElement.style.setProperty('--accent-color', color);
+        localStorage.setItem('accentColor', color);
+    }
 
-                for (let rank = 0; rank < 8; rank++) {
-                    let fileIndex = 0;
-                    for (let char of rows[rank]) {
-                        if (isNaN(char)) {
-                            // It's a piece
-                            const square = squares[squareIndex + fileIndex];
-                            if (square) {
-                                square.innerHTML = `<span class="chess-piece">${pieces[char] || ''}</span>`;
-                            }
-                            fileIndex++;
-                        } else {
-                            // It's a number (empty squares)
-                            fileIndex += parseInt(char);
-                        }
-                    }
-                    squareIndex += 8;
-                }
-            }
+    updateLightSquare(color) {
+        // Remove existing light square style
+        document.querySelectorAll('style[data-square-type="light"]').forEach(style => style.remove());
+        
+        const style = document.createElement('style');
+        style.setAttribute('data-square-type', 'light');
+        style.textContent = `.chess-square.light { background-color: ${color} !important; }`;
+        document.head.appendChild(style);
+        localStorage.setItem('lightSquare', color);
+    }
 
-            updateButtons() {
-                this.prevBtn.disabled = this.currentPosition === 0;
-                this.nextBtn.disabled = this.currentPosition === this.positions.length - 1;
-            }
+    updateDarkSquare(color) {
+        // Remove existing dark square style
+        document.querySelectorAll('style[data-square-type="dark"]').forEach(style => style.remove());
+        
+        const style = document.createElement('style');
+        style.setAttribute('data-square-type', 'dark');
+        style.textContent = `.chess-square.dark { background-color: ${color} !important; }`;
+        document.head.appendChild(style);
+        localStorage.setItem('darkSquare', color);
+    }
 
-            updateMoveDisplay() {
-                if (this.currentPosition === 0) {
-                    this.moveDisplay.textContent = 'Starting Position';
-                } else {
-                    this.moveDisplay.textContent = this.moves[this.currentPosition - 1];
-                }
-            }
-
-            updateExplanation() {
-                if (this.explanations[this.currentPosition]) {
-                    this.explanationElement.innerHTML = this.explanations[this.currentPosition];
-                }
-            }
-
-            previousMove() {
-                if (this.currentPosition > 0) {
-                    this.currentPosition--;
-                    this.updateDisplay();
-                }
-            }
-
-            nextMove() {
-                if (this.currentPosition < this.positions.length - 1) {
-                    this.currentPosition++;
-                    this.updateDisplay();
-                }
-            }
+    loadSettings() {
+        // Load dark mode
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        this.darkModeToggle.checked = isDarkMode;
+        if (isDarkMode) {
+            document.body.setAttribute('data-theme', 'dark');
         }
 
-        // Initialize chess boards when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            // Ruy Lopez main sequence
-            const ruyLopezBoard = new ChessBoard('ruy-lopez-board', 'ruy-prev', 'ruy-next', 'ruy-move-display', 'ruy-move-explanation');
-            
-            const ruyLopezPositions = [
-                'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-                'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
-                'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
-                'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3',
-                'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3'
-            ];
-            
-            const ruyLopezMoves = [
-                '1. e4',
-                '1...e5', 
-                '2. Nf3',
-                '2...Nc6',
-                '3. Bb5'
-            ];
-            
-            const ruyLopezExplanations = [
-                '<p><strong>Starting Position</strong><br>White is about to begin with the King\'s pawn.</p>',
-                '<p><strong>1. e4</strong><br><em>Note:</em> White\'s King pawn advances two squares, immediately staking a claim in the center. This move also opens lines for White\'s Queen and King\'s Bishop, preparing for rapid development and potential attacks.</p>',
-                '<p><strong>1...e5</strong><br><em>Note:</em> Black mirrors White\'s pawn move, also taking central space and opening lines for their Queen and King\'s Bishop. This creates a symmetrical and balanced starting position.</p>',
-                '<p><strong>2. Nf3</strong><br><em>Note:</em> White develops the King\'s Knight to a natural square (f3). From here, it attacks Black\'s e5 pawn and controls key central squares like d4 and e5. This move also prepares for kingside castling.</p>',
-                '<p><strong>2...Nc6</strong><br><em>Note:</em> Black develops the Queen\'s Knight to c6. This defends the e5 pawn, which is under attack by White\'s knight on f3, and also controls the d4 square.</p>',
-                '<p><strong>3. Bb5 - THIS IS THE RUY LOPEZ!</strong><br><em>Note:</em> White\'s King\'s Bishop moves to b5. This move creates a "pin" on Black\'s c6 Knight (meaning if the knight moves, the King\'s pawn on e5 would be undefended). It also puts indirect pressure on the center and prepares for White\'s kingside castling.</p>'
-            ];
-            
-            ruyLopezBoard.setMoveSequence(ruyLopezPositions, ruyLopezMoves, ruyLopezExplanations);
+        // Load colors
+        const gradientStart = localStorage.getItem('gradientStart') || '#2563eb';
+        const gradientEnd = localStorage.getItem('gradientEnd') || '#8b5cf6';
+        const accentColor = localStorage.getItem('accentColor') || '#3b82f6';
+        const lightSquare = localStorage.getItem('lightSquare') || '#f0d9b5';
+        const darkSquare = localStorage.getItem('darkSquare') || '#b58863';
 
-            // Scandinavian Defense
-            const scandinavianBoard = new ChessBoard('scandinavian-board', 'scandinavian-prev', 'scandinavian-next', 'scandinavian-move-display', 'scandinavian-move-explanation');
-            
-            const scandinavianPositions = [
-                'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-                'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2',
-                'rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2',
-                'rnb1kbnr/ppp1pppp/8/3q4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3'
-            ];
-            
-            const scandinavianMoves = [
-                '1. e4',
-                '1...d5',
-                '2. exd5',
-                '2...Qxd5'
-            ];
-            
-            const scandinavianExplanations = [
-                '<p><strong>Starting Position</strong></p>',
-                '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
-                '<p><strong>1...d5 - The Scandinavian Defense</strong><br><em>Note:</em> Black immediately challenges White\'s e4 pawn in the center. This opens lines for Black\'s Queen and Bishop very early.</p>',
-                '<p><strong>2. exd5</strong><br><em>Note:</em> White captures Black\'s pawn, opening the center. This move often gains a "tempo" (a free move) because Black\'s Queen will likely recapture, and White can then develop a knight to attack it.</p>',
-                '<p><strong>2...Qxd5</strong><br><em>Note:</em> Black recaptures with the Queen. White will typically play 3. Nc3, developing a knight and attacking Black\'s exposed Queen, forcing it to move again.</p>'
-            ];
-            
-            scandinavianBoard.setMoveSequence(scandinavianPositions, scandinavianMoves, scandinavianExplanations);
+        this.gradientStart.value = gradientStart;
+        this.gradientEnd.value = gradientEnd;
+        this.accentColor.value = accentColor;
+        this.lightSquare.value = lightSquare;
+        this.darkSquare.value = darkSquare;
 
-            // French Defense
-            const frenchBoard = new ChessBoard('french-board', 'french-prev', 'french-next', 'french-move-display', 'french-move-explanation');
-            
-            const frenchPositions = [
-                'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-                'rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
-                'rnbqkbnr/pppp1ppp/4p3/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2',
-                'rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3'
-            ];
-            
-            const frenchMoves = [
-                '1. e4',
-                '1...e6',
-                '2. d4',
-                '2...d5'
-            ];
-            
-            const frenchExplanations = [
-                '<p><strong>Starting Position</strong></p>',
-                '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
-                '<p><strong>1...e6 - The French Defense</strong><br><em>Note:</em> Black prepares to push the d-pawn to d5, creating a solid pawn chain (e6-d5). This move, however, temporarily blocks Black\'s light-squared bishop on f8.</p>',
-                '<p><strong>2. d4</strong><br><em>Note:</em> White establishes a strong central pawn duo (pawns on e4 and d4), controlling a large portion of the board.</p>',
-                '<p><strong>2...d5</strong><br><em>Note:</em> Black challenges White\'s strong center. This often leads to a "closed" game with locked pawn chains, where strategic maneuvering and pawn breaks are key.</p>'
-            ];
-            
-            frenchBoard.setMoveSequence(frenchPositions, frenchMoves, frenchExplanations);
+        this.updateGradientStart(gradientStart);
+        this.updateGradientEnd(gradientEnd);
+        this.updateAccentColor(accentColor);
+        this.updateLightSquare(lightSquare);
+        this.updateDarkSquare(darkSquare);
+    }
 
-            // Caro-Kann Defense
-            const caroKannBoard = new ChessBoard('caro-kann-board', 'caro-kann-prev', 'caro-kann-next', 'caro-kann-move-display', 'caro-kann-move-explanation');
-            
-            const caroKannPositions = [
-                'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-                'rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
-                'rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2',
-                'rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3'
-            ];
-            
-            const caroKannMoves = [
-                '1. e4',
-                '1...c6',
-                '2. d4',
-                '2...d5'
-            ];
-            
-            const caroKannExplanations = [
-                '<p><strong>Starting Position</strong></p>',
-                '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
-                '<p><strong>1...c6 - The Caro-Kann Defense</strong><br><em>Note:</em> Black prepares to push the d-pawn to d5, similar to the French Defense, but with the key difference that the light-squared bishop (on c8) is not blocked by the e-pawn.</p>',
-                '<p><strong>2. d4</strong><br><em>Note:</em> White once again establishes a strong central pawn presence with pawns on e4 and d4.</p>',
-                '<p><strong>2...d5</strong><br><em>Note:</em> Black challenges White\'s center. The Caro-Kann often leads to solid and flexible positions for Black, with less cramped piece play than the French Defense.</p>'
-            ];
-            
-            caroKannBoard.setMoveSequence(caroKannPositions, caroKannMoves, caroKannExplanations);
+    resetToDefaults() {
+        localStorage.clear();
+        this.gradientStart.value = '#2563eb';
+        this.gradientEnd.value = '#8b5cf6';
+        this.accentColor.value = '#3b82f6';
+        this.lightSquare.value = '#f0d9b5';
+        this.darkSquare.value = '#b58863';
+        this.darkModeToggle.checked = false;
 
-            // Sicilian Defense
-            const sicilianBoard = new ChessBoard('sicilian-board', 'sicilian-prev', 'sicilian-next', 'sicilian-move-display', 'sicilian-move-explanation');
-            
-            const sicilianPositions = [
-                'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-                'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2',
-                'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
-                'r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3'
-            ];
-            
-            const sicilianMoves = [
-                '1. e4',
-                '1...c5',
-                '2. Nf3',
-                '2...Nc6'
-            ];
-            
-            const sicilianExplanations = [
-                '<p><strong>Starting Position</strong></p>',
-                '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
-                '<p><strong>1...c5 - The Sicilian Defense</strong><br><em>Note:</em> Black plays the c-pawn to c5, creating an immediate asymmetrical pawn structure. This is an aggressive move, directly challenging White\'s d4 square.</p>',
-                '<p><strong>2. Nf3</strong><br><em>Note:</em> White develops a knight, prepares to castle, and controls the d4 square, often aiming for a later d4 pawn push to open the center.</p>',
-                '<p><strong>2...Nc6</strong><br><em>Note:</em> Black develops a knight, protecting the d4 square and preparing for further development. The Sicilian Defense is known for leading to very sharp, tactical, and open games with active piece play.</p>'
-            ];
-            
-            sicilianBoard.setMoveSequence(sicilianPositions, sicilianMoves, sicilianExplanations);
+        document.documentElement.style.setProperty('--primary-gradient-start', '#2563eb');
+        document.documentElement.style.setProperty('--primary-gradient-end', '#8b5cf6');
+        document.documentElement.style.setProperty('--accent-color', '#3b82f6');
+        document.body.setAttribute('data-theme', 'light');
 
-            // Philidor Defense
-            const philidorBoard = new ChessBoard('philidor-board', 'philidor-prev', 'philidor-next', 'philidor-move-display', 'philidor-move-explanation');
-            
-            const philidorPositions = [
-                'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-                'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
-                'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
-                'rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3',
-                'rnbqkbnr/ppp2ppp/3p4/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3'
-            ];
-            
-            const philidorMoves = [
-                '1. e4',
-                '1...e5',
-                '2. Nf3',
-                '2...d6',
-                '3. d4'
-            ];
-            
-            const philidorExplanations = [
-                '<p><strong>Starting Position</strong></p>',
-                '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
-                '<p><strong>1...e5</strong><br>Black mirrors with the King\'s pawn.</p>',
-                '<p><strong>2. Nf3</strong><br>White develops the knight, attacking e5.</p>',
-                '<p><strong>2...d6 - The Philidor Defense</strong><br><em>Note:</em> Black defends the e5 pawn with another pawn (d6). While solid, this move blocks Black\'s own f8-bishop, often leading to a more passive and cramped position for Black.</p>',
-                '<p><strong>3. d4</strong><br><em>Note:</em> White builds a strong central pawn duo (e4 and d4), aiming to exploit Black\'s passive setup by gaining more space and opening lines for White\'s pieces.</p>'
-            ];
-            
-            philidorBoard.setMoveSequence(philidorPositions, philidorMoves, philidorExplanations);
+        // Remove custom square colors
+        document.querySelectorAll('style[data-square-type]').forEach(style => style.remove());
 
-            // Petrov Defense
-            const petrovBoard = new ChessBoard('petrov-board', 'petrov-prev', 'petrov-next', 'petrov-move-display', 'petrov-move-explanation');
-            
-            const petrovPositions = [
-                'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
-                'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
-                'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
-                'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
-                'rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3',
-                'rnbqkb1r/pppp1ppp/5n2/4N3/8/8/PPPP1PPP/RNBQKB1R b KQkq - 0 3'
-            ];
-            
-            const petrovMoves = [
-                '1. e4',
-                '1...e5',
-                '2. Nf3',
-                '2...Nf6',
-                '3. Nxe5'
-            ];
-            
-            const petrovExplanations = [
-                '<p><strong>Starting Position</strong></p>',
-                '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
-                '<p><strong>1...e5</strong><br>Black mirrors with the King\'s pawn.</p>',
-                '<p><strong>2. Nf3</strong><br>White develops the knight, attacking e5.</p>',
-                '<p><strong>2...Nf6 - The Petrov Defense</strong><br><em>Note:</em> Black immediately counter-attacks White\'s e4 pawn with their knight. This often leads to symmetrical positions.</p>',
-                '<p><strong>3. Nxe5</strong><br><em>Note:</em> White captures Black\'s e5 pawn. Black will almost always recapture on e4, leading to a pawn exchange and often a more simplified game. The Petrov is known for its solidity and tendency to lead to early draws at higher levels.</p>'
-            ];
-            
-            petrovBoard.setMoveSequence(petrovPositions, petrovMoves, petrovExplanations);
+        location.reload(); // Refresh to apply default styles
+    }
+}
 
-            // Morphy Defense
-            const morphyBoard = new ChessBoard('morphy-board', 'morphy-prev', 'morphy-next', 'morphy-move-display', 'morphy-move-explanation');
-            
-            const morphyPositions = [
-                'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-                'r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4',
-                'r1bqkbnr/1ppp1ppp/p1n5/4p3/1B2P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 4',
-                'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/1B2P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5',
-                'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/1B2P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 3 5',
-                'r1bqk2r/1ppp1ppp/p1n2n2/2b1p3/1B2P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 4 6'
-            ];
-            
-            const morphyMoves = [
-                '3...a6',
-                '4. Ba4',
-                '4...Nf6',
-                '5. O-O',
-                '5...Be7'
-            ];
-            
-            const morphyExplanations = [
-                '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
-                '<p><strong>3...a6 - The Morphy Defense</strong><br><em>Note:</em> Black immediately attacks White\'s bishop on b5 with the \'a\' pawn, asking it to make a decision. This is the most common and classical response, leading to the "Closed Ruy Lopez."</p>',
-                '<p><strong>4. Ba4</strong><br><em>Note:</em> White retreats the bishop to a4, maintaining the pressure on Black\'s c6 knight and the long diagonal.</p>',
-                '<p><strong>4...Nf6</strong><br><em>Note:</em> Black develops the King\'s Knight, attacking White\'s e4 pawn and preparing to castle.</p>',
-                '<p><strong>5. O-O</strong><br><em>Note:</em> White castles kingside, getting the King to safety and preparing to activate the Rook on e1.</p>',
-                '<p><strong>5...Be7</strong><br><em>Note:</em> Black develops the King\'s Bishop, preparing to castle. This leads to a complex, strategic game where both sides maneuver for central control and positional advantages. White often aims for a c3-d4 pawn break, while Black seeks counterplay on the queenside or through central pawn pushes.</p>'
-            ];
-            
-            morphyBoard.setMoveSequence(morphyPositions, morphyMoves, morphyExplanations);
+// Chess board class
+class ChessBoard {
+    constructor(boardId, prevBtnId, nextBtnId, moveDisplayId, explanationId) {
+        this.boardElement = document.getElementById(boardId);
+        this.prevBtn = document.getElementById(prevBtnId);
+        this.nextBtn = document.getElementById(nextBtnId);
+        this.moveDisplay = document.getElementById(moveDisplayId);
+        this.explanationElement = document.getElementById(explanationId);
+        this.currentPosition = 0;
+        this.positions = [];
+        this.moves = [];
+        this.explanations = [];
+        
+        this.initializeBoard();
+        this.setupEventListeners();
+    }
 
-            // Berlin Defense
-            const berlinBoard = new ChessBoard('berlin-board', 'berlin-prev', 'berlin-next', 'berlin-move-display', 'berlin-move-explanation');
-            
-            const berlinPositions = [
-                'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-                'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
-                'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4',
-                'r1bqkb1r/pppp1ppp/2n5/1B2p3/4n3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 5'
-            ];
-            
-            const berlinMoves = [
-                '3...Nf6',
-                '4. O-O',
-                '4...Nxe4'
-            ];
-            
-            const berlinExplanations = [
-                '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
-                '<p><strong>3...Nf6 - The Berlin Defense</strong><br><em>Note:</em> Black develops the King\'s Knight and immediately attacks White\'s e4 pawn, instead of addressing the bishop on b5 first.</p>',
-                '<p><strong>4. O-O</strong><br><em>Note:</em> White castles kingside, often allowing Black to capture the e4 pawn, as White has compensation in development and central influence.</p>',
-                '<p><strong>4...Nxe4</strong><br><em>Note:</em> Black captures White\'s e4 pawn. This often leads to early Queen exchanges and simplified positions, giving the Berlin its reputation as the "Berlin Wall" -- a solid, drawish defense at the highest levels. White aims to exploit Black\'s slightly compromised pawn structure.</p>'
-            ];
-            
-            berlinBoard.setMoveSequence(berlinPositions, berlinMoves, berlinExplanations);
+    initializeBoard() {
+        this.boardElement.innerHTML = '';
+        for (let rank = 8; rank >= 1; rank--) {
+            for (let file = 1; file <= 8; file++) {
+                const square = document.createElement('div');
+                square.className = `chess-square ${(rank + file) % 2 === 0 ? 'dark' : 'light'}`;
+                square.dataset.square = String.fromCharCode(96 + file) + rank;
+                this.boardElement.appendChild(square);
+            }
+        }
+    }
 
-            // Exchange Variation
-            const exchangeBoard = new ChessBoard('exchange-board', 'exchange-prev', 'exchange-next', 'exchange-move-display', 'exchange-move-explanation');
-            
-            const exchangePositions = [
-                'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-                'r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4',
-                'r1bqkbnr/1ppp1ppp/p7/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 4',
-                'r1bqkbnr/1pp2ppp/p7/1B1pp3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5'
-            ];
-            
-            const exchangeMoves = [
-                '3...a6',
-                '4. Bxc6',
-                '4...dxc6'
-            ];
-            
-            const exchangeExplanations = [
-                '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
-                '<p><strong>3...a6</strong><br>Black attacks the bishop.</p>',
-                '<p><strong>4. Bxc6 - The Exchange Variation</strong><br><em>Note:</em> White captures Black\'s knight on c6, immediately doubling Black\'s pawns on the c-file. White gives up the "bishop pair" (having both bishops) but gains a long-term pawn structure advantage.</p>',
-                '<p><strong>4...dxc6</strong><br><em>Note:</em> Black recaptures with the d-pawn, resulting in two pawns on the c-file (c7 and c6 pawns on the same file). White\'s main plan is to trade pieces and aim for an endgame where their kingside pawn majority can create a passed pawn, while Black relies on the activity of their bishop pair in the middlegame.</p>'
-            ];
-            
-            exchangeBoard.setMoveSequence(exchangePositions, exchangeMoves, exchangeExplanations);
+    setupEventListeners() {
+        this.prevBtn.addEventListener('click', () => this.previousMove());
+        this.nextBtn.addEventListener('click', () => this.nextMove());
+    }
 
-            // Marshall Attack
-            const marshallBoard = new ChessBoard('marshall-board', 'marshall-prev', 'marshall-next', 'marshall-move-display', 'marshall-move-explanation');
-            
-            const marshallPositions = [
-                'r1bqk2r/1ppp1ppp/p1n2n2/2b1p3/1B2P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 4 6',
-                'r1bqk2r/1ppp1ppp/p1n2n2/2b1p3/1B2P3/5N2/PPPP1PPP/RNBQR1K1 b kq - 5 6',
-                'r1bq1rk1/1ppp1ppp/p1n2n2/1bb1p3/1B2P3/5N2/PPPP1PPP/RNBQR1K1 w - - 6 7',
-                'r1bq1rk1/1ppp1ppp/p1n2n2/1bb1p3/4P3/1B3N2/PPPP1PPP/RNBQR1K1 b - - 7 7',
-                'r1bq1rk1/2pp1ppp/p1n2n2/1bbBp3/4P3/5N2/PPPP1PPP/RNBQR1K1 w - - 8 8',
-                'r1bq1rk1/2pp1ppp/p1n2n2/1bbBp3/4P3/2P2N2/PP1P1PPP/RNBQR1K1 b - - 0 8',
-                'r1bq1rk1/2p2ppp/p1n2n2/1bbpp3/4P3/2P2N2/PP1P1PPP/RNBQR1K1 w - d6 0 9'
-            ];
-            
-            const marshallMoves = [
-                '6. Re1',
-                '6...b5',
-                '7. Bb3',
-                '7...O-O',
-                '8. c3',
-                '8...d5'
-            ];
-            
-            const marshallExplanations = [
-                '<p><strong>Morphy Defense setup</strong><br>After 1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7</p>',
-                '<p><strong>6. Re1</strong><br>White develops the rook.</p>',
-                '<p><strong>6...b5</strong><br>Black attacks the bishop.</p>',
-                '<p><strong>7. Bb3</strong><br>White retreats the bishop.</p>',
-                '<p><strong>7...O-O</strong><br>Black castles.</p>',
-                '<p><strong>8. c3</strong><br>White prepares d4.</p>',
-                '<p><strong>8...d5 - The Marshall Attack!</strong><br><em>Note:</em> Black sacrifices a pawn on d5 to immediately open lines for their pieces and launch a fierce kingside attack. This is a highly aggressive and complex line. White must be prepared to defend precisely or find counter-attacking opportunities.</p>'
-            ];
-            
-            marshallBoard.setMoveSequence(marshallPositions, marshallMoves, marshallExplanations);
+    setMoveSequence(positions, moves, explanations) {
+        this.positions = positions;
+        this.moves = moves;
+        this.explanations = explanations;
+        this.currentPosition = 0;
+        this.updateDisplay();
+    }
 
-            // Open Ruy Lopez
-            const openBoard = new ChessBoard('open-board', 'open-prev', 'open-next', 'open-move-display', 'open-move-explanation');
-            
-            const openPositions = [
-                'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/1B2P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 3 5',
-                'r1bqkb1r/1ppp1ppp/p1n5/4p3/1B2n3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 6',
-                'r1bqkb1r/1ppp1ppp/p1n5/4p3/1B2P3/5N2/PPP2PPP/RNBQ1RK1 b kq d3 0 6'
-            ];
-            
-            const openMoves = [
-                '5...Nxe4',
-                '6. d4'
-            ];
-            
-            const openExplanations = [
-                '<p><strong>After 5. O-O in the Morphy Defense</strong></p>',
-                '<p><strong>5...Nxe4 - The Open Ruy Lopez</strong><br><em>Note:</em> Black captures White\'s e4 pawn. While Black is temporarily up a pawn, White gains a lead in development and opens the center.</p>',
-                '<p><strong>6. d4</strong><br><em>Note:</em> White immediately challenges Black\'s central presence and opens lines for their rooks and bishops. This leads to dynamic and tactical positions where White aims to regain the pawn with interest.</p>'
-            ];
-            
-            openBoard.setMoveSequence(openPositions, openMoves, openExplanations);
+    updateDisplay() {
+        this.displayPosition(this.positions[this.currentPosition]);
+        this.updateButtons();
+        this.updateMoveDisplay();
+        this.updateExplanation();
+    }
 
-            // Steinitz Defense
-            const steinitzBoard = new ChessBoard('steinitz-board', 'steinitz-prev', 'steinitz-next', 'steinitz-move-display', 'steinitz-move-explanation');
-            
-            const steinitzPositions = [
-                'r1bqkbnr/1ppp1ppp/p1n5/4p3/1B2P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 4',
-                'r1bqkbnr/1pp2ppp/p1np4/4p3/1B2P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5'
-            ];
-            
-            const steinitzMoves = [
-                '4...d6'
-            ];
-            
-            const steinitzExplanations = [
-                '<p><strong>After 3...a6 4. Ba4</strong></p>',
-                '<p><strong>4...d6 - The Steinitz Defense</strong><br><em>Note:</em> Black pushes the d-pawn, creating a solid, defensive pawn structure (e5 and d6). However, this move can block Black\'s light-squared bishop on f8, often leading to a more passive position. White typically enjoys a space advantage and aims to slowly build pressure.</p>'
-            ];
-            
-            steinitzBoard.setMoveSequence(steinitzPositions, steinitzMoves, steinitzExplanations);
-
-            // Classical Variation
-            const classicalBoard = new ChessBoard('classical-board', 'classical-prev', 'classical-next', 'classical-move-display', 'classical-move-explanation');
-            
-            const classicalPositions = [
-                'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-                'r1bqk1nr/pppp1ppp/2n5/1Bb1p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
-                'r1bqk1nr/pppp1ppp/2n5/1Bb1p3/4P3/2P2N2/PP1P1PPP/RNBQK2R b KQkq - 0 4'
-            ];
-            
-            const classicalMoves = [
-                '3...Bc5',
-                '4. c3'
-            ];
-            
-            const classicalExplanations = [
-                '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
-                '<p><strong>3...Bc5 - The Classical Variation</strong><br><em>Note:</em> Black develops the dark-squared bishop to c5 very actively, putting immediate pressure on White\'s f2 square and aiming for a quick kingside attack.</p>',
-                '<p><strong>4. c3</strong><br><em>Note:</em> White prepares d4 to challenge Black\'s center and bishop. White aims to maintain central control and develop, while being wary of Black\'s active bishop.</p>'
-            ];
-            
-            classicalBoard.setMoveSequence(classicalPositions, classicalMoves, classicalExplanations);
-
-            // Schliemann Defense
-            const schliemannBoard = new ChessBoard('schliemann-board', 'schliemann-prev', 'schliemann-next', 'schliemann-move-display', 'schliemann-move-explanation');
-            
-            const schliemannPositions = [
-                'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-                'r1bqkbnr/pppp2pp/2n5/1B2pp2/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq f6 0 4'
-            ];
-            
-            const schliemannMoves = [
-                '3...f5'
-            ];
-            
-            const schliemannExplanations = [
-                '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
-                '<p><strong>3...f5 - The Schliemann Defense</strong><br><em>Note:</em> Black immediately pushes the f-pawn, creating a very aggressive and sharp gambit. Black sacrifices a pawn for rapid development and an open f-file, aiming for a kingside attack. This leads to wild, tactical positions where White must be precise in their defense and counter-attack.</p>'
-            ];
-            
-            schliemannBoard.setMoveSequence(schliemannPositions, schliemannMoves, schliemannExplanations);
-
-            // Cozio Defense
-            const cozioBoard = new ChessBoard('cozio-board', 'cozio-prev', 'cozio-next', 'cozio-move-display', 'cozio-move-explanation');
-            
-            const cozioPositions = [
-                'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
-                'r1bqkb1r/pppp1ppp/2n1n3/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
-            ];
-            
-            const cozioMoves = [
-                '3...Nge7'
-            ];
-            
-            const cozioExplanations = [
-                '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
-                '<p><strong>3...Nge7 - The Cozio Defense</strong><br><em>Note:</em> Black develops the knight to e7, an unusual square. This move keeps the f-pawn unblocked (allowing for a later ...f5 or ...f6) and provides flexibility for the knight to reroute to g6 or f5. It\'s a quieter, more flexible approach for Black, often leading to slower, more maneuvering games.</p>'
-            ];
-            
-            cozioBoard.setMoveSequence(cozioPositions, cozioMoves, cozioExplanations);
-
-            // Arkhangelsk Defense
-            const arkhangelskBoard = new ChessBoard('arkhangelsk-board', 'arkhangelsk-prev', 'arkhangelsk-next', 'arkhangelsk-move-display', 'arkhangelsk-move-explanation');
-            
-            const arkhangelskPositions = [
-                'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/1B2P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 3 5',
-                'r1bqk2r/1ppp1ppp/p1n2n2/2b1p3/1B2P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 4 6'
-            ];
-            
-            const arkhangelskMoves = [
-                '5...Bc5'
-            ];
-            
-            const arkhangelskExplanations = [
-                '<p><strong>After 5. O-O in the Morphy Defense</strong><br>Following 1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O</p>',
-                '<p><strong>5...Bc5 - The Arkhangelsk Defense</strong><br><em>Note:</em> Black develops the dark-squared bishop to c5 very actively, similar to the Classical Variation, but often after a6 and Nf6. This aims for dynamic piece play and puts pressure on White\'s d4 square. This variation leads to sharp and tactical middlegames, as Black seeks to gain initiative with active pieces.</p>'
-            ];
-            
-            arkhangelskBoard.setMoveSequence(arkhangelskPositions, arkhangelskMoves, arkhangelskExplanations);
-
-            // Section toggle functionality
-            document.querySelectorAll('.section-toggle').forEach(button => {
-                button.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const content = document.getElementById(targetId);
-                    
-                    if (content.classList.contains('active')) {
-                        content.classList.remove('active');
-                        this.textContent = 'Show Details';
-                    } else {
-                        content.classList.add('active');
-                        this.textContent = 'Hide Details';
-                    }
-                });
-            });
-
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
+    displayPosition(fen) {
+        const squares = this.boardElement.querySelectorAll('.chess-square');
+        squares.forEach(square => {
+            square.innerHTML = '';
+            square.classList.remove('highlight');
         });
+
+        // Parse FEN and place pieces
+        const position = fen.split(' ')[0];
+        const rows = position.split('/');
+        let squareIndex = 0;
+
+        for (let rank = 0; rank < 8; rank++) {
+            let fileIndex = 0;
+            for (let char of rows[rank]) {
+                if (isNaN(char)) {
+                    // It's a piece
+                    const square = squares[squareIndex + fileIndex];
+                    if (square) {
+                        const isWhite = char === char.toUpperCase();
+                        const pieceClass = isWhite ? 'white' : 'black';
+                        square.innerHTML = `<span class="chess-piece ${pieceClass}">${pieces[char] || ''}</span>`;
+                    }
+                    fileIndex++;
+                } else {
+                    // It's a number (empty squares)
+                    fileIndex += parseInt(char);
+                }
+            }
+            squareIndex += 8;
+        }
+    }
+
+    updateButtons() {
+        this.prevBtn.disabled = this.currentPosition === 0;
+        this.nextBtn.disabled = this.currentPosition === this.positions.length - 1;
+    }
+
+    updateMoveDisplay() {
+        if (this.currentPosition === 0) {
+            this.moveDisplay.textContent = 'Starting Position';
+        } else {
+            this.moveDisplay.textContent = this.moves[this.currentPosition - 1];
+        }
+    }
+
+    updateExplanation() {
+        if (this.explanations[this.currentPosition]) {
+            this.explanationElement.innerHTML = this.explanations[this.currentPosition];
+        }
+    }
+
+    previousMove() {
+        if (this.currentPosition > 0) {
+            this.currentPosition--;
+            this.updateDisplay();
+        }
+    }
+
+    nextMove() {
+        if (this.currentPosition < this.positions.length - 1) {
+            this.currentPosition++;
+            this.updateDisplay();
+        }
+    }
+}
+
+// Initialize chess boards when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Settings Manager
+    new SettingsManager();
+
+    // Ruy Lopez main sequence
+    const ruyLopezBoard = new ChessBoard('ruy-lopez-board', 'ruy-prev', 'ruy-next', 'ruy-move-display', 'ruy-move-explanation');
+    
+    const ruyLopezPositions = [
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+        'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
+        'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+        'r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3',
+        'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3'
+    ];
+    
+    const ruyLopezMoves = [
+        '1. e4',
+        '1...e5', 
+        '2. Nf3',
+        '2...Nc6',
+        '3. Bb5'
+    ];
+    
+    const ruyLopezExplanations = [
+        '<p><strong>Starting Position</strong><br>White is about to begin with the King\'s pawn.</p>',
+        '<p><strong>1. e4</strong><br><em>Note:</em> White\'s King pawn advances two squares, immediately staking a claim in the center. This move also opens lines for White\'s Queen and King\'s Bishop, preparing for rapid development and potential attacks.</p>',
+        '<p><strong>1...e5</strong><br><em>Note:</em> Black mirrors White\'s pawn move, also taking central space and opening lines for their Queen and King\'s Bishop. This creates a symmetrical and balanced starting position.</p>',
+        '<p><strong>2. Nf3</strong><br><em>Note:</em> White develops the King\'s Knight to a natural square (f3). From here, it attacks Black\'s e5 pawn and controls key central squares like d4 and e5. This move also prepares for kingside castling.</p>',
+        '<p><strong>2...Nc6</strong><br><em>Note:</em> Black develops the Queen\'s Knight to c6. This defends the e5 pawn, which is under attack by White\'s knight on f3, and also controls the d4 square.</p>',
+        '<p><strong>3. Bb5 - THIS IS THE RUY LOPEZ!</strong><br><em>Note:</em> White\'s King\'s Bishop moves to b5. This move creates a "pin" on Black\'s c6 Knight (meaning if the knight moves, the King\'s pawn on e5 would be undefended). It also puts indirect pressure on the center and prepares for White\'s kingside castling.</p>'
+    ];
+    
+    ruyLopezBoard.setMoveSequence(ruyLopezPositions, ruyLopezMoves, ruyLopezExplanations);
+
+    // Scandinavian Defense
+    const scandinavianBoard = new ChessBoard('scandinavian-board', 'scandinavian-prev', 'scandinavian-next', 'scandinavian-move-display', 'scandinavian-move-explanation');
+    
+    const scandinavianPositions = [
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+        'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2',
+        'rnbqkbnr/ppp1pppp/8/3P4/8/8/PPPP1PPP/RNBQKBNR b KQkq - 0 2',
+        'rnb1kbnr/ppp1pppp/8/3q4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3'
+    ];
+    
+    const scandinavianMoves = [
+        '1. e4',
+        '1...d5',
+        '2. exd5',
+        '2...Qxd5'
+    ];
+    
+    const scandinavianExplanations = [
+        '<p><strong>Starting Position</strong></p>',
+        '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
+        '<p><strong>1...d5 - The Scandinavian Defense</strong><br><em>Note:</em> Black immediately challenges White\'s e4 pawn in the center. This opens lines for Black\'s Queen and Bishop very early.</p>',
+        '<p><strong>2. exd5</strong><br><em>Note:</em> White captures Black\'s pawn, opening the center. This move often gains a "tempo" (a free move) because Black\'s Queen will likely recapture, and White can then develop a knight to attack it.</p>',
+        '<p><strong>2...Qxd5</strong><br><em>Note:</em> Black recaptures with the Queen. White will typically play 3. Nc3, developing a knight and attacking Black\'s exposed Queen, forcing it to move again.</p>'
+    ];
+    
+    scandinavianBoard.setMoveSequence(scandinavianPositions, scandinavianMoves, scandinavianExplanations);
+
+    // French Defense
+    const frenchBoard = new ChessBoard('french-board', 'french-prev', 'french-next', 'french-move-display', 'french-move-explanation');
+    
+    const frenchPositions = [
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+        'rnbqkbnr/pppp1ppp/4p3/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
+        'rnbqkbnr/pppp1ppp/4p3/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2',
+        'rnbqkbnr/ppp2ppp/4p3/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3'
+    ];
+    
+    const frenchMoves = [
+        '1. e4',
+        '1...e6',
+        '2. d4',
+        '2...d5'
+    ];
+    
+    const frenchExplanations = [
+        '<p><strong>Starting Position</strong></p>',
+        '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
+        '<p><strong>1...e6 - The French Defense</strong><br><em>Note:</em> Black prepares to push the d-pawn to d5, creating a solid pawn chain (e6-d5). This move, however, temporarily blocks Black\'s light-squared bishop on f8.</p>',
+        '<p><strong>2. d4</strong><br><em>Note:</em> White establishes a strong central pawn duo (pawns on e4 and d4), controlling a large portion of the board.</p>',
+        '<p><strong>2...d5</strong><br><em>Note:</em> Black challenges White\'s strong center. This often leads to a "closed" game with locked pawn chains, where strategic maneuvering and pawn breaks are key.</p>'
+    ];
+    
+    frenchBoard.setMoveSequence(frenchPositions, frenchMoves, frenchExplanations);
+
+    // Caro-Kann Defense
+    const caroKannBoard = new ChessBoard('caro-kann-board', 'caro-kann-prev', 'caro-kann-next', 'caro-kann-move-display', 'caro-kann-move-explanation');
+    
+    const caroKannPositions = [
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+        'rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2',
+        'rnbqkbnr/pp1ppppp/2p5/8/3PP3/8/PPP2PPP/RNBQKBNR b KQkq d3 0 2',
+        'rnbqkbnr/pp2pppp/2p5/3p4/3PP3/8/PPP2PPP/RNBQKBNR w KQkq d6 0 3'
+    ];
+    
+    const caroKannMoves = [
+        '1. e4',
+        '1...c6',
+        '2. d4',
+        '2...d5'
+    ];
+    
+    const caroKannExplanations = [
+        '<p><strong>Starting Position</strong></p>',
+        '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
+        '<p><strong>1...c6 - The Caro-Kann Defense</strong><br><em>Note:</em> Black prepares to push the d-pawn to d5, similar to the French Defense, but with the key difference that the light-squared bishop (on c8) is not blocked by the e-pawn.</p>',
+        '<p><strong>2. d4</strong><br><em>Note:</em> White once again establishes a strong central pawn presence with pawns on e4 and d4.</p>',
+        '<p><strong>2...d5</strong><br><em>Note:</em> Black challenges White\'s center. The Caro-Kann often leads to solid and flexible positions for Black, with less cramped piece play than the French Defense.</p>'
+    ];
+    
+    caroKannBoard.setMoveSequence(caroKannPositions, caroKannMoves, caroKannExplanations);
+
+    // Sicilian Defense
+    const sicilianBoard = new ChessBoard('sicilian-board', 'sicilian-prev', 'sicilian-next', 'sicilian-move-display', 'sicilian-move-explanation');
+    
+    const sicilianPositions = [
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+        'rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR w KQkq c6 0 2',
+        'rnbqkbnr/pp1ppppp/8/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+        'r1bqkbnr/pp1ppppp/2n5/2p5/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3'
+    ];
+    
+    const sicilianMoves = [
+        '1. e4',
+        '1...c5',
+        '2. Nf3',
+        '2...Nc6'
+    ];
+    
+    const sicilianExplanations = [
+        '<p><strong>Starting Position</strong></p>',
+        '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
+        '<p><strong>1...c5 - The Sicilian Defense</strong><br><em>Note:</em> Black plays the c-pawn to c5, creating an immediate asymmetrical pawn structure. This is an aggressive move, directly challenging White\'s d4 square.</p>',
+        '<p><strong>2. Nf3</strong><br><em>Note:</em> White develops a knight, prepares to castle, and controls the d4 square, often aiming for a later d4 pawn push to open the center.</p>',
+        '<p><strong>2...Nc6</strong><br><em>Note:</em> Black develops a knight, protecting the d4 square and preparing for further development. The Sicilian Defense is known for leading to very sharp, tactical, and open games with active piece play.</p>'
+    ];
+    
+    sicilianBoard.setMoveSequence(sicilianPositions, sicilianMoves, sicilianExplanations);
+
+    // Philidor Defense
+    const philidorBoard = new ChessBoard('philidor-board', 'philidor-prev', 'philidor-next', 'philidor-move-display', 'philidor-move-explanation');
+    
+    const philidorPositions = [
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+        'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
+        'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+        'rnbqkbnr/ppp2ppp/3p4/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 0 3',
+        'rnbqkbnr/ppp2ppp/3p4/4p3/3PP3/5N2/PPP2PPP/RNBQKB1R b KQkq d3 0 3'
+    ];
+    
+    const philidorMoves = [
+        '1. e4',
+        '1...e5',
+        '2. Nf3',
+        '2...d6',
+        '3. d4'
+    ];
+    
+    const philidorExplanations = [
+        '<p><strong>Starting Position</strong></p>',
+        '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
+        '<p><strong>1...e5</strong><br>Black mirrors with the King\'s pawn.</p>',
+        '<p><strong>2. Nf3</strong><br>White develops the knight, attacking e5.</p>',
+        '<p><strong>2...d6 - The Philidor Defense</strong><br><em>Note:</em> Black defends the e5 pawn with another pawn (d6). While solid, this move blocks Black\'s own f8-bishop, often leading to a more passive and cramped position for Black.</p>',
+        '<p><strong>3. d4</strong><br><em>Note:</em> White builds a strong central pawn duo (e4 and d4), aiming to exploit Black\'s passive setup by gaining more space and opening lines for White\'s pieces.</p>'
+    ];
+    
+    philidorBoard.setMoveSequence(philidorPositions, philidorMoves, philidorExplanations);
+
+    // Petrov Defense - CORRECTED
+    const petrovBoard = new ChessBoard('petrov-board', 'petrov-prev', 'petrov-next', 'petrov-move-display', 'petrov-move-explanation');
+    
+    const petrovPositions = [
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1',
+        'rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2',
+        'rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2',
+        'rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3',
+        'rnbqkb1r/pppp1ppp/5n2/4N3/4P3/8/PPPP1PPP/RNBQKB1R w KQkq - 0 1'
+    ];
+    
+    const petrovMoves = [
+        '1. e4',
+        '1...e5',
+        '2. Nf3',
+        '2...Nf6',
+        '3. Nxe5'
+    ];
+    
+    const petrovExplanations = [
+        '<p><strong>Starting Position</strong></p>',
+        '<p><strong>1. e4</strong><br>White opens with the King\'s pawn.</p>',
+        '<p><strong>1...e5</strong><br>Black mirrors with the King\'s pawn.</p>',
+        '<p><strong>2. Nf3</strong><br>White develops the knight, attacking e5.</p>',
+        '<p><strong>2...Nf6 - The Petrov Defense</strong><br><em>Note:</em> Black immediately counter-attacks White\'s e4 pawn with their knight. This often leads to symmetrical positions.</p>',
+        '<p><strong>3. Nxe5</strong><br><em>Note:</em> White captures Black\'s e5 pawn. Black will almost always recapture on e4 with 3...Nxe4, leading to a pawn exchange and often a more simplified game. The Petrov is known for its solidity and tendency to lead to early draws at higher levels.</p>'
+    ];
+    
+    petrovBoard.setMoveSequence(petrovPositions, petrovMoves, petrovExplanations);
+
+    // Morphy Defense - CORRECTED
+    const morphyBoard = new ChessBoard('morphy-board', 'morphy-prev', 'morphy-next', 'morphy-move-display', 'morphy-move-explanation');
+    
+    const morphyPositions = [
+        'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+        'r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4',
+        'r1bqkbnr/1ppp1ppp/p1n5/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 4',
+        'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 2 5',
+        'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 3 5'
+    ];
+    
+    const morphyMoves = [
+        '3...a6',
+        '4. Ba4',
+        '4...Nf6',
+        '5. O-O',
+    ];
+    
+    const morphyExplanations = [
+        '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
+        '<p><strong>3...a6 - The Morphy Defense</strong><br><em>Note:</em> Black immediately attacks White\'s bishop on b5 with the \'a\' pawn, asking it to make a decision. This is the most common and classical response, leading to the "Closed Ruy Lopez."</p>',
+        '<p><strong>4. Ba4</strong><br><em>Note:</em> White retreats the bishop to a4, maintaining the pressure on Black\'s c6 knight and the long diagonal.</p>',
+        '<p><strong>4...Nf6</strong><br><em>Note:</em> Black develops the King\'s Knight, attacking White\'s e4 pawn and preparing to castle.</p>',
+        '<p><strong>5. O-O</strong><br><em>Note:</em> White castles kingside, getting the King to safety and preparing to activate the Rook on e1.</p>'
+    ];
+    
+    morphyBoard.setMoveSequence(morphyPositions, morphyMoves, morphyExplanations);
+
+    // Berlin Defense
+    const berlinBoard = new ChessBoard('berlin-board', 'berlin-prev', 'berlin-next', 'berlin-move-display', 'berlin-move-explanation');
+    
+    const berlinPositions = [
+        'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+        'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
+        'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 5 4',
+        'r1bqkb1r/pppp1ppp/2n5/1B2p3/4n3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 5'
+    ];
+    
+    const berlinMoves = [
+        '3...Nf6',
+        '4. O-O',
+        '4...Nxe4'
+    ];
+    
+    const berlinExplanations = [
+        '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
+        '<p><strong>3...Nf6 - The Berlin Defense</strong><br><em>Note:</em> Black develops the King\'s Knight and immediately attacks White\'s e4 pawn, instead of addressing the bishop on b5 first.</p>',
+        '<p><strong>4. O-O</strong><br><em>Note:</em> White castles kingside, often allowing Black to capture the e4 pawn, as White has compensation in development and central influence.</p>',
+        '<p><strong>4...Nxe4</strong><br><em>Note:</em> Black captures White\'s e4 pawn. This often leads to early Queen exchanges and simplified positions, giving the Berlin its reputation as the "Berlin Wall" -- a solid, drawish defense at the highest levels. White aims to exploit Black\'s slightly compromised pawn structure.</p>'
+    ];
+    
+    berlinBoard.setMoveSequence(berlinPositions, berlinMoves, berlinExplanations);
+
+    // Exchange Variation - CORRECTED
+    const exchangeBoard = new ChessBoard('exchange-board', 'exchange-prev', 'exchange-next', 'exchange-move-display', 'exchange-move-explanation');
+    
+    const exchangePositions = [
+        'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+        'r1bqkbnr/1ppp1ppp/p1n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4',
+        'r1bqkbnr/1ppp1ppp/p1B5/4p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 4',
+        'r1bqkbnr/1pp2ppp/p1p5/4p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 0 4'
+    ];
+    
+    const exchangeMoves = [
+        '3...a6',
+        '4. Bxc6',
+        '4...dxc6'
+    ];
+    
+    const exchangeExplanations = [
+        '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
+        '<p><strong>3...a6</strong><br>Black attacks the bishop.</p>',
+        '<p><strong>4. Bxc6 - The Exchange Variation</strong><br><em>Note:</em> White captures Black\'s knight on c6, immediately doubling Black\'s pawns on the c-file. White gives up the "bishop pair" (having both bishops) but gains a long-term pawn structure advantage.</p>',
+        '<p><strong>4...dxc6</strong><br><em>Note:</em> Black recaptures with the d-pawn, resulting in two pawns on the c-file (c7 and c6 pawns on the same file). White\'s main plan is to trade pieces and aim for an endgame where their kingside pawn majority can create a passed pawn, while Black relies on the activity of their bishop pair in the middlegame.</p>'
+    ];
+    
+    exchangeBoard.setMoveSequence(exchangePositions, exchangeMoves, exchangeExplanations);
+
+    // Marshall Attack - CORRECTED
+    const marshallBoard = new ChessBoard('marshall-board', 'marshall-prev', 'marshall-next', 'marshall-move-display', 'marshall-move-explanation');
+    
+    const marshallPositions = [
+        'r1bqk2r/1pppbppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 4 6',
+        'r1bqk2r/1pppbppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQR1K1 b kq - 5 6',
+        'r1bqk2r/2ppbppp/p1n2n2/1p2p3/B3P3/5N2/PPPP1PPP/RNBQR1K1 w kq b6 0 7',
+        'r1bqk2r/2ppbppp/p1n2n2/1p2p3/4P3/1B3N2/PPPP1PPP/RNBQR1K1 b kq - 1 7',
+        'r1bq1rk1/2ppbppp/p1n2n2/1p2p3/4P3/1B3N2/PPPP1PPP/RNBQR1K1 w - - 2 8',
+        'r1bq1rk1/2ppbppp/p1n2n2/1p2p3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1 b - - 0 8',
+        'r1bq1rk1/2p1bppp/p1n2n2/1p1pp3/4P3/1BP2N2/PP1P1PPP/RNBQR1K1 w - d6 0 9'
+    ];
+    
+    const marshallMoves = [
+        '6. Re1',
+        '6...b5',
+        '7. Bb3',
+        '7...O-O',
+        '8. c3',
+        '8...d5'
+    ];
+    
+    const marshallExplanations = [
+        '<p><strong>Morphy Defense setup</strong><br>After 1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O Be7</p>',
+        '<p><strong>6. Re1</strong><br>White develops the rook.</p>',
+        '<p><strong>6...b5</strong><br>Black attacks the bishop.</p>',
+        '<p><strong>7. Bb3</strong><br>White retreats the bishop.</p>',
+        '<p><strong>7...O-O</strong><br>Black castles.</p>',
+        '<p><strong>8. c3</strong><br>White prepares d4.</p>',
+        '<p><strong>8...d5 - The Marshall Attack!</strong><br><em>Note:</em> Black sacrifices a pawn on d5 to immediately open lines for their pieces and launch a fierce kingside attack. This is a highly aggressive and complex line. White must be prepared to defend precisely or find counter-attacking opportunities.</p>'
+    ];
+    
+    marshallBoard.setMoveSequence(marshallPositions, marshallMoves, marshallExplanations);
+
+    // Open Ruy Lopez - CORRECTED
+    const openBoard = new ChessBoard('open-board', 'open-prev', 'open-next', 'open-move-display', 'open-move-explanation');
+    
+    const openPositions = [
+        'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 3 5',
+        'r1bqkb1r/1ppp1ppp/p1n5/4p3/B3n3/5N2/PPPP1PPP/RNBQ1RK1 w kq - 0 6',
+        'r1bqkb1r/1ppp1ppp/p1n5/4p3/B2Pn3/5N2/PPP2PPP/RNBQ1RK1 b kq d3 0 6'
+    ];
+    
+    const openMoves = [
+        '5...Nxe4',
+        '6. d4'
+    ];
+    
+    const openExplanations = [
+        '<p><strong>After 5. O-O in the Morphy Defense</strong></p>',
+        '<p><strong>5...Nxe4 - The Open Ruy Lopez</strong><br><em>Note:</em> Black captures White\'s e4 pawn. While Black is temporarily up a pawn, White gains a lead in development and opens the center.</p>',
+        '<p><strong>6. d4</strong><br><em>Note:</em> White immediately challenges Black\'s central presence and opens lines for their rooks and bishops. This leads to dynamic and tactical positions where White aims to regain the pawn with interest.</p>'
+    ];
+    
+    openBoard.setMoveSequence(openPositions, openMoves, openExplanations);
+
+    // Steinitz Defense - CORRECTED
+    const steinitzBoard = new ChessBoard('steinitz-board', 'steinitz-prev', 'steinitz-next', 'steinitz-move-display', 'steinitz-move-explanation');
+    
+    const steinitzPositions = [
+        'r1bqkbnr/1ppp1ppp/p1n5/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 1 4',
+        'r1bqkbnr/1pp2ppp/p1np4/4p3/B3P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 5'
+    ];
+    
+    const steinitzMoves = [
+        '4...d6'
+    ];
+    
+    const steinitzExplanations = [
+        '<p><strong>After 3...a6 4. Ba4</strong></p>',
+        '<p><strong>4...d6 - The Steinitz Defense</strong><br><em>Note:</em> Black pushes the d-pawn, creating a solid, defensive pawn structure (e5 and d6). However, this move can block Black\'s light-squared bishop on f8, often leading to a more passive position. White typically enjoys a space advantage and aims to slowly build pressure.</p>'
+    ];
+    
+    steinitzBoard.setMoveSequence(steinitzPositions, steinitzMoves, steinitzExplanations);
+
+    // Classical Variation
+    const classicalBoard = new ChessBoard('classical-board', 'classical-prev', 'classical-next', 'classical-move-display', 'classical-move-explanation');
+    
+    const classicalPositions = [
+        'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+        'r1bqk1nr/pppp1ppp/2n5/1Bb1p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4',
+        'r1bqk1nr/pppp1ppp/2n5/1Bb1p3/4P3/2P2N2/PP1P1PPP/RNBQK2R b KQkq - 0 4'
+    ];
+    
+    const classicalMoves = [
+        '3...Bc5',
+        '4. c3'
+    ];
+    
+    const classicalExplanations = [
+        '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
+        '<p><strong>3...Bc5 - The Classical Variation</strong><br><em>Note:</em> Black develops the dark-squared bishop to c5 very actively, putting immediate pressure on White\'s f2 square and aiming for a quick kingside attack.</p>',
+        '<p><strong>4. c3</strong><br><em>Note:</em> White prepares d4 to challenge Black\'s center and bishop. White aims to maintain central control and develop, while being wary of Black\'s active bishop.</p>'
+    ];
+    
+    classicalBoard.setMoveSequence(classicalPositions, classicalMoves, classicalExplanations);
+
+    // Schliemann Defense
+    const schliemannBoard = new ChessBoard('schliemann-board', 'schliemann-prev', 'schliemann-next', 'schliemann-move-display', 'schliemann-move-explanation');
+    
+    const schliemannPositions = [
+        'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+        'r1bqkbnr/pppp2pp/2n5/1B2pp2/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq f6 0 4'
+    ];
+    
+    const schliemannMoves = [
+        '3...f5'
+    ];
+    
+    const schliemannExplanations = [
+        '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
+        '<p><strong>3...f5 - The Schliemann Defense</strong><br><em>Note:</em> Black immediately pushes the f-pawn, creating a very aggressive and sharp gambit. Black sacrifices a pawn for rapid development and an open f-file, aiming for a kingside attack. This leads to wild, tactical positions where White must be precise in their defense and counter-attack.</p>'
+    ];
+    
+    schliemannBoard.setMoveSequence(schliemannPositions, schliemannMoves, schliemannExplanations);
+
+    // Cozio Defense - CORRECTED
+    const cozioBoard = new ChessBoard('cozio-board', 'cozio-prev', 'cozio-next', 'cozio-move-display', 'cozio-move-explanation');
+    
+    const cozioPositions = [
+        'r1bqkbnr/pppp1ppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R b KQkq - 3 3',
+        'r1bqkb1r/ppppnppp/2n5/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4'
+    ];
+    
+    const cozioMoves = [
+        '3...Nge7'
+    ];
+    
+    const cozioExplanations = [
+        '<p><strong>After 3. Bb5 - The Ruy Lopez position</strong></p>',
+        '<p><strong>3...Nge7 - The Cozio Defense</strong><br><em>Note:</em> Black develops the knight to e7, an unusual square. This move keeps the f-pawn unblocked (allowing for a later ...f5 or ...f6) and provides flexibility for the knight to reroute to g6 or f5. It\'s a quieter, more flexible approach for Black, often leading to slower, more maneuvering games.</p>'
+    ];
+    
+    cozioBoard.setMoveSequence(cozioPositions, cozioMoves, cozioExplanations);
+
+    // Arkhangelsk Defense - CORRECTED
+    const arkhangelskBoard = new ChessBoard('arkhangelsk-board', 'arkhangelsk-prev', 'arkhangelsk-next', 'arkhangelsk-move-display', 'arkhangelsk-move-explanation');
+    
+    const arkhangelskPositions = [
+        'r1bqkb1r/1ppp1ppp/p1n2n2/4p3/B3P3/5N2/PPPP1PPP/RNBQ1RK1 b kq - 3 5',
+        'r1bqkb1r/2pp1ppp/p1n2n2/1p2p3/B3P3/5N2/PPPP1PPP/RNBQ1RK1 w kq b6 0 6',
+        'r1bqkb1r/2pp1ppp/p1n2n2/1p2p3/4P3/1B3N2/PPPP1PPP/RNBQ1RK1 b kq - 1 6',
+        'r2qkb1r/1bpp1ppp/p1n2n2/1p2p3/4P3/1B3N2/PPPP1PPP/RNBQ1RK1 w kq - 2 7'
+    ];
+    
+    const arkhangelskMoves = [
+        '5...b5',
+        '6.Bb3',
+        '6...Bb7'
+    ];
+    
+    const arkhangelskExplanations = [
+        '<p><strong>After 5. O-O in the Morphy Defense</strong><br>Following 1.e4 e5 2.Nf3 Nc6 3.Bb5 a6 4.Ba4 Nf6 5.O-O</p>',
+        "<p><strong>5...b5</strong><br><em>Note:</em> Black attacks White's bishop on a4, forcing it to move.</p>",
+        "<p><strong>6. Bb3</strong><br><em>Note:</em> White's bishop retreats again, maintaining its influence on the long diagonal (a2-g8) and indirectly supporting the d4 pawn push.</p>",
+        "<p><strong>6...Bb7</strong><br><em>Note:</em> Black develops the queen's bishop to a strong diagonal (a8-h1), where it eyes White's center and potentially the kingside.</p>"
+        //'<p><strong>5...Bc5 - The Arkhangelsk Defense</strong><br><em>Note:</em> Black develops the dark-squared bishop to c5 very actively, similar to the Classical Variation, but often after a6 and Nf6. This aims for dynamic piece play and puts pressure on White\'s d4 square. This variation leads to sharp and tactical middlegames, as Black seeks to gain initiative with active pieces.</p>'
+    ];
+    
+    arkhangelskBoard.setMoveSequence(arkhangelskPositions, arkhangelskMoves, arkhangelskExplanations);
+
+    // Section toggle functionality
+    document.querySelectorAll('.section-toggle').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const content = document.getElementById(targetId);
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                this.textContent = 'Show Details';
+            } else {
+                content.classList.add('active');
+                this.textContent = 'Hide Details';
+            }
+        });
+    });
+
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+});
     </script>
 </body>
-</html>
+</html>   
