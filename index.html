@@ -1,98 +1,97 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Orar Main Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 100px;
-        }
-        .button {
-            display: inline-block;
-            padding: 20px 40px;
-            margin: 20px;
-            font-size: 1.2em;
-            text-decoration: none;
-            color: #fff;
-            background-color: #0078d7;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-        .button:hover {
-            background-color: #005fa3;
-        }
-        .top-left-link {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 1.1em;
-            text-decoration: none;
-            color: #0078d7;
-            background: #f3f3f3;
-            padding: 8px 18px;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-            font-weight: bold;
-            transition: background 0.2s, color 0.2s;
-        }
-        .top-left-link:hover {
-            background: #e0e0e0;
-            color: #005fa3;
-        }
-        .last-update {
-        margin-top: 16px;
-        margin-bottom: 32px;
-        font-size: 1.05em;
-        color: #555;
-        }
-        footer {
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            width: 100%;
-            background: #f3f3f3;
-            color: #333;
-            text-align: center;
-            padding: 12px 0;
-            font-size: 1em;
-            box-shadow: 0 -2px 6px rgba(0,0,0,0.07);
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Duck's Lair</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <a href="https://micu.is-a.dev" class="top-left-link">micu.is-a.dev</a>
-    <h1>Accesează Orarul</h1>
-        <div class="last-update">
-        Ultima actualizare: 09.09.2025
+    <div class="nav">
+        <div class="logo">quack</div>
+        <div class="nav_buttons">
+            <a href="/openings/">Openings</a>
+            <a href="/club/">Chess Club</a>
+            <a href="https://github.com/MicuBogdan">PROJECTS</a>
+            <a href="#" id="openOverlay">ABOUT</a>
+        </div>
+        <div class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <label for="theme-toggle" class="switch-label"></label>
+        </div>
     </div>
-    <a href="https://micu.is-a.dev/orar/9A/" class="button">9A</a>
-    <a href="https://micu.is-a.dev/orar/9B/" class="button">9B</a>
-    <a href="https://micu.is-a.dev/orar/9C/" class="button">9C</a>
-    <a href="https://micu.is-a.dev/orar/9D/" class="button">9D</a>
-    <a href="https://micu.is-a.dev/orar/9E/" class="button">9E</a>
-    <br>
-    <a href="https://micu.is-a.dev/orar/10A/" class="button">10A</a>
-    <a href="https://micu.is-a.dev/orar/10B/" class="button">10B</a>
-    <a href="https://micu.is-a.dev/orar/10C/" class="button">10C</a>
-    <a href="https://micu.is-a.dev/orar/10D/" class="button">10D</a>
-    <a href="https://micu.is-a.dev/orar/10E/" class="button">10E</a>
-    <br>
-    <a href="https://micu.is-a.dev/orar/11A/" class="button">11A</a>
-    <a href="https://micu.is-a.dev/orar/11B/" class="button">11B</a>
-    <a href="https://micu.is-a.dev/orar/11C/" class="button">11C</a>
-    <a href="https://micu.is-a.dev/orar/11D/" class="button">11D</a>
-    <br>
-    <a href="https://micu.is-a.dev/orar/12A/" class="button">12A</a>
-    <a href="https://micu.is-a.dev/orar/12B/" class="button">12B</a>
-    <a href="https://micu.is-a.dev/orar/12C/" class="button">12C</a>
-    <a href="https://micu.is-a.dev/orar/12D/" class="button">12D</a>
-    <br>
-    <br>
-    <br>
+
+    <div id="overlay">
+        <div class="overlay-content">
+            <a href="#" id="closeOverlay" class="exit-btn">Exit</a>
+            <div class="about-me">
+                <h2>Hi, I’m Micu Vlad-Bogdan</h2>
+                <p>
+                    I’m a Front-End Developer based in Bucharest, Romania. I specialize in creating dynamic and user-friendly web interfaces, mainly using JavaScript and Python.
+                </p>
+                <p>
+                    Always learning, always growing—that’s my approach to development.
+                </p>
+            </div>
+            
+            <div class="contact-me">
+                <h3>Contact Me</h3>
+                <p>Email: <a href="mailto:micuvbogdan@gmail.com">micuvbogdan@gmail.com</a></p>
+                <p>GitHub: <a href="https://github.com/MicuBogdan" target="_blank">github.com/MicuBogdan</a></p>
+            </div>
+            
+        </div>
+    </div>
+
+    <div class="hero">
+        <div class="column">
+            
+            <div class="px">
+                <p>Micu Bogdan's</p>
+            </div>
+            
+            <div class="pp">
+                <p>Portfolio</p>
+            </div>
+            
+        </div>
+        <div class="column">
+            <div class="fill">
+                <img src="giphy.gif" alt="">
+            </div>
+        </div>
+    </div>
+
+    <div class="slider_container">
+        <div class="slider" id="slider">
+            <div class="text t">Welcome to Portfolio</div>
+            <div class="text duck">🦆</div>
+            <div class="text t">Welcome to Portfolio</div>
+            <div class="text duck">🦆</div>
+            <div class="text t">Welcome to Portfolio</div>
+            <div class="text duck">🦆</div>
+            <div class="text t">Welcome to Portfolio</div>
+            <div class="text duck">🦆</div>
+        </div>
+    </div>
+
+    <div class="row1">
+        <div class="column1 left"><br></div>
+        <div class="column1 middle">
+
+            <h2>Hello👋</h2>
+            <p>I'm a front-end developer <br> working in Bucharest, Romania.</p>
+
+        </div>
+        <div class="column1 right"><br></div>
+    </div>
+
+        <br>
+
     <footer>
-        Made by Micu Vlad-Bogdan
+            <div class="f-text">
+                <p>© 2025 Micu Vlad-Bogdan.</p>
+            </div>
     </footer>
+    <script src="index.js"></script>
 </body>
 </html>
