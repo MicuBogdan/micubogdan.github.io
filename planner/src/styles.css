@@ -366,15 +366,88 @@ footer {
 @media (max-width: 900px) {
     .planner-container {
         grid-template-columns: 1fr;
+        gap: 1em;
     }
-    
     .scrollHeader, footer {
-        left: 20px;
-        right: 20px;
+        left: 10px;
+        right: 10px;
+        min-width: unset;
+        max-width: unset;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
     }
-    
     .bodyOverlay {
-        width: calc(100vw - 4em);
+        width: 98vw;
+        min-width: unset;
+        max-width: unset;
+        left: 50vw;
+        transform: translate(-50%, -50%);
+        padding: 1.2em 0.5em;
+        border-width: 8px;
+        border-radius: 1em;
+        max-height: 90vh;
+    }
+    .butoane-clase-coloana {
+        max-width: 100vw;
+        gap: 0.4em;
+        padding: 0.5em 0;
+    }
+    .clasa-btn {
+        font-size: 0.95em;
+        padding: 0.4em 0.7em;
+        min-width: 3.5em;
+    }
+    .add-test-section, .tests-list, .activity-log {
+        padding: 0.7em;
+        font-size: 0.95em;
+    }
+    .test-item {
+        padding: 0.7em;
+    }
+    .activity-log {
+        height: 300px;
+    }
+}
+@media (max-width: 600px) {
+    .scrollHeader {
+        left: 0;
+        right: 0;
+        border-radius: 0 0 1em 1em;
+        padding-left: 0.2em;
+        padding-right: 0.2em;
+    }
+    footer {
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: 0;
+        border-radius: 1em 1em 0 0;
+        padding-bottom: 0.7em;
+    }
+    .bodyOverlay {
+        width: 100vw;
+        border-radius: 0.7em;
+        border-width: 5px;
+        padding: 0.7em 0.1em;
+    }
+    .butoane-clase-coloana {
+        max-width: 100vw;
+        gap: 0.2em;
+    }
+    .clasa-btn {
+        font-size: 0.9em;
+        padding: 0.3em 0.5em;
+        min-width: 2.7em;
+    }
+    .add-test-section, .tests-list, .activity-log {
+        padding: 0.4em;
+        font-size: 0.9em;
+    }
+    .test-item {
+        padding: 0.5em;
+    }
+    .activity-log {
+        height: 180px;
     }
 }
 
