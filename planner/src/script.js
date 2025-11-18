@@ -1,28 +1,39 @@
-// Storage wrapper: use window.storage if available, else fallback to localStorage
-if (!window.storage) {
-    window.storage = {
-        async set(key, value) {
-            localStorage.setItem(key, value);
-            return Promise.resolve();
-        },
-        async get(key) {
-            const value = localStorage.getItem(key);
-            return Promise.resolve({ value });
-        },
-        async delete(key) {
-            localStorage.removeItem(key);
-            return Promise.resolve();
-        },
-        async list(prefix) {
-            const keys = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const k = localStorage.key(i);
-                if (k && k.startsWith(prefix)) keys.push(k);
-            }
-            return Promise.resolve({ keys });
-        }
-    };
-}
+// Storage wrapper: folosește Firestore (db trebuie să fie deja definit global din index.html)
+window.storage = {
+    async set(key, value) {
+        // key: 'tests:clasa:id' sau 'activity:clasa:id'
+        const [type, clasa, id] = key.split(':');
+        const collection = (type === 'tests') ? 'tests' : 'activity';
+        await db.collection(collection).doc(`${clasa}_${id}`).set({
+            ...JSON.parse(value),
+            clasa: clasa
+        });
+    },
+    async get(key) {
+        const [type, clasa, id] = key.split(':');
+        const collection = (type === 'tests') ? 'tests' : 'activity';
+        const doc = await db.collection(collection).doc(`${clasa}_${id}`).get();
+        return { value: doc.exists ? JSON.stringify(doc.data()) : null };
+    },
+    async delete(key) {
+        const [type, clasa, id] = key.split(':');
+        const collection = (type === 'tests') ? 'tests' : 'activity';
+        await db.collection(collection).doc(`${clasa}_${id}`).delete();
+    },
+    async list(prefix) {
+        // prefix: 'tests:clasa:' sau 'activity:clasa:'
+        const [type, clasa] = prefix.split(':');
+        const collection = (type === 'tests') ? 'tests' : 'activity';
+        const snapshot = await db.collection(collection).where('clasa', '==', clasa).get();
+        const keys = [];
+        snapshot.forEach(doc => {
+            // Extrage id-ul original (fără clasa_)
+            const docId = doc.id.startsWith(clasa + '_') ? doc.id.slice(clasa.length + 1) : doc.id;
+            keys.push(`${type}:${clasa}:${docId}`);
+        });
+        return { keys };
+    }
+};
 // Class codes - CHANGE THESE FOR EACH CLASS
 const CLASS_CODES = {
     '9A': 'cod9A2024',
