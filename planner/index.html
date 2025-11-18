@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Planner</title>
+    <meta name="description" content="Planificator pentru teste si diverse.">
+    <meta name="author" content="Micu Vlad-Bogdan">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Planner">
+    <meta property="og:description" content="Planificator pentru teste si diverse.">
+    <meta property="og:image" content="src/icon.ico">
+    <meta property="og:url" content="https://micu.is-a.dev/planner/">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Planner">
+    <meta name="twitter:description" content="Planificator pentru teste si diverse.">
+    <meta name="twitter:image" content="src/icon.ico">
+
+    <!-- Favicons & theme -->
+    <link rel="icon" href="src/icon.ico">
+    <link rel="apple-touch-icon" href="src/icon.ico">
+    <meta name="theme-color" content="#317EFB">
+
+    <!-- Preconnect to font hosts and load fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Preload critical CSS -->
+    <link rel="preload" href="src/styles.css" as="style">
+
+    <!-- Styles & scripts -->
+    <link rel="stylesheet" href="src/styles.css">
+    <script src="src/script.js" defer></script>
+</head>
+<body>
+    <div class="bodyShadow"></div>
+    
+    <div class="scrollHeader">
+        <span id="headerTitle">Selectează clasa</span>
+        <button id="backBtn" class="header-btn" style="display: none;">← Înapoi</button>
+    </div>
+    
+    <div class="bodyOverlay">
+        <!-- Class Selection Screen -->
+        <div id="classSelection" class="screen active">
+            <div class="butoane-clase-coloana">
+                <button class="clasa-btn" data-clasa="9A">IX A</button>
+                <button class="clasa-btn" data-clasa="9B">IX B</button>
+                <button class="clasa-btn" data-clasa="9C">IX C</button>
+                <button class="clasa-btn" data-clasa="9D">IX D</button>
+                <button class="clasa-btn" data-clasa="9E">IX E</button><br>
+                <button class="clasa-btn" data-clasa="10A">X A</button>
+                <button class="clasa-btn" data-clasa="10B">X B</button>
+                <button class="clasa-btn" data-clasa="10C">X C</button>
+                <button class="clasa-btn" data-clasa="10D">X D</button>
+                <button class="clasa-btn" data-clasa="10E">X E</button><br>
+                <button class="clasa-btn" data-clasa="11A">XI A</button>
+                <button class="clasa-btn" data-clasa="11B">XI B</button>
+                <button class="clasa-btn" data-clasa="11C">XI C</button>
+                <button class="clasa-btn" data-clasa="11D">XI D</button><br>
+                <button class="clasa-btn" data-clasa="12A">XII A</button>
+                <button class="clasa-btn" data-clasa="12B">XII B</button>
+                <button class="clasa-btn" data-clasa="12C">XII C</button>
+                <button class="clasa-btn" data-clasa="12D">XII D</button>
+            </div>
+        </div>
+
+        <!-- Planner Screen -->
+        <div id="plannerScreen" class="screen">
+            <div class="planner-container">
+                <!-- Left side: Calendar and Add Test -->
+                <div class="planner-left">
+                    <div class="add-test-section">
+                        <h3>Adaugă Test</h3>
+                        <input type="text" id="testSubject" placeholder="Materie" maxlength="50">
+                        <input type="date" id="testDate">
+                        <textarea id="testDetails" placeholder="Detalii (opțional)" maxlength="200"></textarea>
+                        <input type="password" id="classCode" placeholder="Cod clasă">
+                        <button id="addTestBtn" class="action-btn">Adaugă Test</button>
+                    </div>
+
+                    <div class="tests-list">
+                        <h3>Teste Programate</h3>
+                        <div id="testsList"></div>
+                    </div>
+                </div>
+
+                <!-- Right side: Activity Log -->
+                <div class="planner-right">
+                    <div class="activity-log">
+                        <h3>Istoric Activitate</h3>
+                        <div id="activityLog"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Made by Micu Vlad-Bogdan</p>
+    </footer>
+</body>
+</html>
