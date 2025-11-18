@@ -36,24 +36,23 @@
 
     <!-- Styles & scripts -->
     <link rel="stylesheet" href="src/styles.css">
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
-        // TODO: Add SDKs for Firebase products that you want to use
-        // https://firebase.google.com/docs/web/setup#available-libraries
-
-        // Your web app's Firebase configuration
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-        const firebaseConfig = {
-            apiKey: "AIzaSyAEbs8tLBZyTMzmF36ajUy4VI83ln2n5EE",
-            authDomain: "planner-9b6f5.firebaseapp.com",
-            projectId: "planner-9b6f5",
-            storageBucket: "planner-9b6f5.firebasestorage.app",
-            messagingSenderId: "890036064364",
-            appId: "1:890036064364:web:9698f148e06b58af510849",
-            measurementId: "G-LPDLX8L3FR"
-        };
+    <!-- Firebase App (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<!-- Firestore (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAEbs8tLBZyTMzmF36ajUy4VI83ln2n5EE",
+    authDomain: "planner-9b6f5.firebaseapp.com",
+    projectId: "planner-9b6f5",
+    storageBucket: "planner-9b6f5.appspot.com",
+    messagingSenderId: "890036064364",
+    appId: "1:890036064364:web:9698f148e06b58af510849",
+    measurementId: "G-LPDLX8L3FR"
+  };
+  firebase.initializeApp(firebaseConfig);
+  window.db = firebase.firestore();
+</script>
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -129,4 +128,5 @@
         <p>Made by Micu Vlad-Bogdan</p>
     </footer>
 </body>
+
 </html>
