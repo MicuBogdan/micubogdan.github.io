@@ -53,21 +53,17 @@ function signOutGoogle() {
 }
 
 function updateGoogleUi() {
-    const bar = document.getElementById('googleCalendarBar');
-    const signInBtn = document.getElementById('googleSignInBtn');
     const userInfo = document.getElementById('googleUserInfo');
     const addAllBtn = document.getElementById('addAllToCalendarBtn');
-    if (!bar) return;
+    if (!userInfo || !addAllBtn) return;
     if (googleUser && googleUser.getBasicProfile) {
-        signInBtn.style.display = 'none';
         userInfo.style.display = 'inline';
-        addAllBtn.style.display = 'inline';
+        addAllBtn.textContent = 'Export toate testele în Google Calendar';
         const profile = googleUser.getBasicProfile();
         userInfo.innerHTML = `Signed in as <b>${profile.getName()}</b> <button onclick="signOutGoogle()" class="header-btn" style="margin-left:1em;">Sign out</button>`;
     } else {
-        signInBtn.style.display = 'inline';
         userInfo.style.display = 'none';
-        addAllBtn.style.display = 'none';
+        addAllBtn.textContent = 'Export toate testele în Google Calendar';
         userInfo.innerHTML = '';
     }
 }
@@ -229,11 +225,21 @@ function selectClass(clasa) {
     loadTests();
     loadActivity();
     updateGoogleUi();
-    // Google Calendar integration UI (always set up listeners)
-    const signInBtn = document.getElementById('googleSignInBtn');
-    if (signInBtn) signInBtn.addEventListener('click', signInWithGoogle);
+    // Google Calendar integration UI: export button triggers sign-in if needed
     const addAllBtn = document.getElementById('addAllToCalendarBtn');
-    if (addAllBtn) addAllBtn.addEventListener('click', addAllTestsToGoogleCalendar);
+    if (addAllBtn) {
+        addAllBtn.onclick = async function() {
+            if (!googleUser) {
+                try {
+                    await signInWithGoogle();
+                } catch (e) {
+                    alert('Google sign-in failed.');
+                    return;
+                }
+            }
+            addAllTestsToGoogleCalendar();
+        };
+    }
 }
 
 function goBackToClassSelection() {
