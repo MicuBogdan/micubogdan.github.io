@@ -83,12 +83,12 @@ function updateGoogleUi() {
     if (!userInfo || !addAllBtn) return;
     if (googleUser && googleUser.getBasicProfile) {
         userInfo.style.display = 'inline';
-        addAllBtn.textContent = 'Export toate testele în Google Calendar';
+        addAllBtn.textContent = 'Exportă toate testele în Google Calendar';
         const profile = googleUser.getBasicProfile();
         userInfo.innerHTML = `Signed in as <b>${profile.getName()}</b> <button onclick="signOutGoogle()" class="header-btn" style="margin-left:1em;">Sign out</button>`;
     } else {
         userInfo.style.display = 'none';
-        addAllBtn.textContent = 'Export toate testele în Google Calendar';
+        addAllBtn.textContent = 'Conectează-te și exportă în Google Calendar';
         userInfo.innerHTML = '';
     }
 }
