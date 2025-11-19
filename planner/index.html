@@ -62,11 +62,7 @@
 <body>
     <div class="bodyShadow"></div>
 
-    <!-- Google Calendar Integration UI -->
-    <div id="googleCalendarBar" style="text-align:center; margin-bottom:1em;">
-        <button id="addAllToCalendarBtn" class="header-btn" style="margin-left:1em; background:#4285F4; color:white; font-weight:bold;">Export toate testele în Google Calendar</button>
-        <span id="googleUserInfo" style="display:none; margin-left:1em;"></span>
-    </div>
+    <!-- Google Calendar Integration UI moved below -->
 
     <div class="scrollHeader">
         <span id="headerTitle">Selectează clasa</span>
@@ -114,6 +110,8 @@
 
                     <div class="tests-list">
                         <h3>Teste Programate</h3>
+                        <button id="addAllToCalendarBtn" class="header-btn" style="margin:1em 0; background:#4285F4; color:white; font-weight:bold; width:100%;max-width:400px;">Conectează-te și exportă în Google Calendar</button>
+                        <span id="googleUserInfo" style="display:none; margin-left:1em;"></span>
                         <div id="testsList"></div>
                     </div>
                 </div>
