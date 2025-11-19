@@ -1,3 +1,131 @@
+// --- Google Calendar Integration ---
+// 1. Go to https://console.cloud.google.com/apis/credentials
+// 2. Create OAuth 2.0 Client ID (type: Web application)
+// 3. Add your site origin (e.g. https://micu.is-a.dev) to Authorized JavaScript origins
+// 4. Add this redirect URI: https://developers.google.com/oauthplayground (for testing) or your own
+// 5. Replace the CLIENT_ID below with your own
+// 6. Enable the Google Calendar API in your project
+// 7. Serve your site over HTTPS for Google Sign-In to work
+
+const GOOGLE_CLIENT_ID = '890036064364-hs6v98r55aatb9sgs0b5veqpd7r5bptf.apps.googleusercontent.com';
+const GOOGLE_API_SCOPES = 'https://www.googleapis.com/auth/calendar.events';
+let googleAuth = null;
+let googleUser = null;
+
+// Load Google API JS client
+function loadGoogleApiClient() {
+    return new Promise((resolve, reject) => {
+        if (window.gapi) return resolve();
+        const script = document.createElement('script');
+        script.src = 'https://apis.google.com/js/api.js';
+        script.onload = () => {
+            window.gapi.load('client:auth2', resolve);
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+    });
+}
+
+async function initGoogleAuth() {
+    await loadGoogleApiClient();
+    await window.gapi.client.init({
+        clientId: GOOGLE_CLIENT_ID,
+        scope: GOOGLE_API_SCOPES
+    });
+    googleAuth = window.gapi.auth2.getAuthInstance();
+    if (googleAuth.isSignedIn.get()) {
+        googleUser = googleAuth.currentUser.get();
+    }
+}
+
+async function signInWithGoogle() {
+    await initGoogleAuth();
+    return googleAuth.signIn().then(user => {
+        googleUser = user;
+        updateGoogleUi();
+    });
+}
+
+function signOutGoogle() {
+    if (googleAuth) googleAuth.signOut();
+    googleUser = null;
+    updateGoogleUi();
+}
+
+function updateGoogleUi() {
+    const bar = document.getElementById('googleCalendarBar');
+    const signInBtn = document.getElementById('googleSignInBtn');
+    const userInfo = document.getElementById('googleUserInfo');
+    const addAllBtn = document.getElementById('addAllToCalendarBtn');
+    if (!bar) return;
+    if (googleUser && googleUser.getBasicProfile) {
+        signInBtn.style.display = 'none';
+        userInfo.style.display = 'inline';
+        addAllBtn.style.display = 'inline';
+        const profile = googleUser.getBasicProfile();
+        userInfo.innerHTML = `Signed in as <b>${profile.getName()}</b> <button onclick="signOutGoogle()" class="header-btn" style="margin-left:1em;">Sign out</button>`;
+    } else {
+        signInBtn.style.display = 'inline';
+        userInfo.style.display = 'none';
+        addAllBtn.style.display = 'none';
+        userInfo.innerHTML = '';
+    }
+}
+
+async function addAllTestsToGoogleCalendar() {
+    if (!googleUser) return alert('Please sign in with Google first!');
+    // Get all tests for current class
+    const result = await window.storage.list(`tests:${currentClass}:`, true);
+    if (!result || !result.keys || result.keys.length === 0) {
+        alert('Nu există teste de exportat!');
+        return;
+    }
+    // Get all test objects
+    const tests = [];
+    for (const key of result.keys) {
+        try {
+            const testResult = await window.storage.get(key, true);
+            if (testResult && testResult.value) {
+                const test = JSON.parse(testResult.value);
+                tests.push(test);
+            }
+        } catch (err) {}
+    }
+    if (tests.length === 0) {
+        alert('Nu există teste de exportat!');
+        return;
+    }
+    // Add each test as a calendar event
+    let success = 0, fail = 0;
+    for (const test of tests) {
+        try {
+            await window.gapi.client.load('calendar', 'v3');
+            const startDate = new Date(test.date);
+            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+            await window.gapi.client.calendar.events.insert({
+                calendarId: 'primary',
+                resource: {
+                    summary: test.subject,
+                    description: test.details || '',
+                    start: { dateTime: startDate.toISOString() },
+                    end: { dateTime: endDate.toISOString() }
+                }
+            });
+            success++;
+        } catch (e) { fail++; }
+    }
+    alert(`Adăugat în calendar: ${success} teste${fail ? `, ${fail} erori` : ''}`);
+}
+
+// Show Google Calendar bar on planner screen
+function showGoogleCalendarBar() {
+    const bar = document.getElementById('googleCalendarBar');
+    if (bar) bar.style.display = 'block';
+    updateGoogleUi();
+}
+
+// --- END Google Calendar Integration ---
+
 // Storage wrapper: folosește Firestore (db trebuie să fie deja definit global din index.html)
 window.storage = {
     async set(key, value) {
@@ -101,6 +229,12 @@ function selectClass(clasa) {
     // Load tests and activity for this class
     loadTests();
     loadActivity();
+    showGoogleCalendarBar();
+    // Google Calendar integration UI
+    const signInBtn = document.getElementById('googleSignInBtn');
+    if (signInBtn) signInBtn.addEventListener('click', signInWithGoogle);
+    const addAllBtn = document.getElementById('addAllToCalendarBtn');
+    if (addAllBtn) addAllBtn.addEventListener('click', addAllTestsToGoogleCalendar);
 }
 
 function goBackToClassSelection() {
@@ -263,6 +397,7 @@ async function loadTests() {
                 </div>
                 ${test.details ? `<div class="test-details">${escapeHtml(test.details)}</div>` : ''}
                 <button class="delete-test-btn" onclick="deleteTest('${test.id}', '${escapeHtml(test.subject)}', '${test.date}')">Șterge</button>
+                <button class="export-test-btn" onclick="exportTestToICS('${escapeHtml(test.subject)}', '${test.date}', '${escapeHtml(test.details || '')}')">Export</button>
             </div>
         `).join('');
         
@@ -271,6 +406,51 @@ async function loadTests() {
         testsList.innerHTML = '<div class="empty-state">Eroare la încărcarea testelor</div>';
     }
 }
+
+// Export test to .ics (iCalendar) file for Google Calendar import
+function exportTestToICS(subject, date, details) {
+    // Parse date (YYYY-MM-DD)
+    const start = new Date(date);
+    // Default: 1 hour event
+    const end = new Date(start.getTime() + 60 * 60 * 1000);
+    function pad(n) { return n < 10 ? '0' + n : n; }
+    function toICSDate(dt) {
+        return dt.getUTCFullYear() +
+            pad(dt.getUTCMonth() + 1) +
+            pad(dt.getUTCDate()) + 'T' +
+            pad(dt.getUTCHours()) +
+            pad(dt.getUTCMinutes()) +
+            '00Z';
+    }
+    const ics = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Planner App//EN',
+        'BEGIN:VEVENT',
+        'UID:' + Date.now() + '@planner',
+        'DTSTAMP:' + toICSDate(new Date()),
+        'DTSTART:' + toICSDate(start),
+        'DTEND:' + toICSDate(end),
+        'SUMMARY:' + subject,
+        details ? ('DESCRIPTION:' + details.replace(/\n/g, '\\n')) : '',
+        'END:VEVENT',
+        'END:VCALENDAR'
+    ].filter(Boolean).join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${subject.replace(/[^a-zA-Z0-9]/g, '_') || 'test'}_${date}.ics`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }, 100);
+}
+
+// Make exportTestToICS available globally
+window.exportTestToICS = exportTestToICS;
 
 async function logActivity(type, message) {
     const activity = {
