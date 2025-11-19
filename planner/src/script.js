@@ -37,24 +37,21 @@ function loadGoogleApiClient() {
     });
 }
 
-// Function that initializes the API client
 async function initGoogleAuth() {
     await loadGoogleApiClient();
     
-    // The check you added, which failed locally, should succeed on HTTPS
-    if (!window.gapi.client) {
-        throw new Error('gapi.client object is not available after load.');
-    }
-    
-    // Final initialization (using your variables)
+    // 1. Initialize the client (Note: Discovery Docs is required for gapi.client.calendar)
     await window.gapi.client.init({
         clientId: GOOGLE_CLIENT_ID,
         scope: GOOGLE_API_SCOPES,
-        // Including discoveryDocs is good practice for the Calendar API
-        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'] 
+        // CRUCIAL: Add the discoveryDocs
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest']
     });
-    
-    // ... rest of your code to get auth instance ...
+
+    // 2. Load the Calendar client library (often redundant with discoveryDocs but ensures availability)
+    // await window.gapi.client.load('calendar', 'v3'); // Can often skip this if using discoveryDocs above
+
+    // 3. Get the auth instance
     googleAuth = window.gapi.auth2.getAuthInstance();
     if (googleAuth.isSignedIn.get()) {
         googleUser = googleAuth.currentUser.get();
@@ -144,7 +141,6 @@ async function addAllTestsToGoogleCalendar() {
     let success = 0, fail = 0;
     for (const test of tests) {
         try {
-            await window.gapi.client.load('calendar', 'v3');
             const startDate = new Date(test.date);
             const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
             await window.gapi.client.calendar.events.insert({
