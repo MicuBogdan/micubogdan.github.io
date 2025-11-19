@@ -1,19 +1,3 @@
-That is a perfect requirement for scheduling, as it ensures the event appears at a consistent time in every user's local calendar.
-
-The previous time zone issue occurred because JavaScript was implicitly using **UTC**. To fix this, we will explicitly tell the Google Calendar API: "Schedule this event for 8:00 AM, and interpret that time using the user's local time zone."
-
-Here is the updated `script.js` file.
-
-## 🛠️ Updated `src/script.js` (8 AM Fix)
-
-I have made two changes:
-
-1.  **Defined `userTimeZone` (Line 16):** This captures the user's local time zone (e.g., `Europe/Bucharest`).
-2.  **Modified `addAllTestsToGoogleCalendar` (Lines 159-178):** This function now constructs the date string to start at **8:00 AM** and end at **9:00 AM** in the user's specific time zone, ensuring the event is scheduled correctly regardless of where the user is located.
-
-**Replace the entire content of your current `src/script.js` with the following code:**
-
-```javascript
 console.log('[DEBUG] script.js loaded and running');
 // --- Google Calendar Integration ---
 // NOTE: This code uses Google Identity Services (GIS) for sign-in, as gapi.auth2 is deprecated for new clients.
@@ -659,4 +643,3 @@ function escapeHtml(text) {
 
 // Make deleteTest available globally
 window.deleteTest = deleteTest;
-```
