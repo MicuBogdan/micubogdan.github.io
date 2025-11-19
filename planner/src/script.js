@@ -19,9 +19,18 @@ function loadGoogleApiClient() {
         const script = document.createElement('script');
         script.src = 'https://apis.google.com/js/api.js';
         script.onload = () => {
+            if (!window.gapi) {
+                alert('Google API failed to load.');
+                console.error('Google API failed to load after script.onload');
+                return reject(new Error('Google API failed to load'));
+            }
             window.gapi.load('client:auth2', resolve);
         };
-        script.onerror = reject;
+        script.onerror = (e) => {
+            alert('Google API script failed to load. Check your network or adblockers.');
+            console.error('Google API script failed to load', e);
+            reject(e);
+        };
         document.head.appendChild(script);
     });
 }
@@ -39,10 +48,25 @@ async function initGoogleAuth() {
 }
 
 async function signInWithGoogle() {
-    await initGoogleAuth();
+    try {
+        await initGoogleAuth();
+    } catch (e) {
+        alert('Google Auth initialization failed.');
+        console.error('Google Auth initialization failed', e);
+        throw e;
+    }
+    if (!googleAuth) {
+        alert('Google Auth instance not available.');
+        console.error('Google Auth instance not available');
+        throw new Error('Google Auth instance not available');
+    }
     return googleAuth.signIn().then(user => {
         googleUser = user;
         updateGoogleUi();
+    }).catch(e => {
+        alert('Google sign-in failed or was cancelled.');
+        console.error('Google sign-in failed', e);
+        throw e;
     });
 }
 
@@ -229,11 +253,16 @@ function selectClass(clasa) {
     const addAllBtn = document.getElementById('addAllToCalendarBtn');
     if (addAllBtn) {
         addAllBtn.onclick = async function() {
+            if (!window.gapi) {
+                alert('Google API is not loaded. Please check your connection or disable adblockers.');
+                console.error('Google API is not loaded');
+                return;
+            }
             if (!googleUser) {
                 try {
                     await signInWithGoogle();
                 } catch (e) {
-                    alert('Google sign-in failed.');
+                    // Error already handled in signInWithGoogle
                     return;
                 }
             }
