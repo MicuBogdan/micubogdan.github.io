@@ -36,33 +36,41 @@
 
     <!-- Styles & scripts -->
     <link rel="stylesheet" href="src/styles.css">
-    <!-- Firebase App (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<!-- Firestore (compat) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAEbs8tLBZyTMzmF36ajUy4VI83ln2n5EE",
-    authDomain: "planner-9b6f5.firebaseapp.com",
-    projectId: "planner-9b6f5",
-    storageBucket: "planner-9b6f5.appspot.com",
-    messagingSenderId: "890036064364",
-    appId: "1:890036064364:web:9698f148e06b58af510849",
-    measurementId: "G-LPDLX8L3FR"
-  };
-  firebase.initializeApp(firebaseConfig);
-  window.db = firebase.firestore();
-</script>
-
+    <!-- Firebase App (core) -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
+    <!-- Firebase Analytics -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
+    <script>
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAEbs8tLBZyTMzmF36ajUy4VI83ln2n5EE",
+            authDomain: "planner-9b6f5.firebaseapp.com",
+            projectId: "planner-9b6f5",
+            storageBucket: "planner-9b6f5.firebasestorage.app",
+            messagingSenderId: "890036064364",
+            appId: "1:890036064364:web:9698f148e06b58af510849",
+            measurementId: "G-LPDLX8L3FR"
+        };
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+        const app = firebase.initializeApp(firebaseConfig);
+        const analytics = firebase.analytics(app);
+        // Initialize Firestore and expose globally
+        window.db = firebase.firestore();
     </script>
     <script src="src/script.js" defer></script>
 </head>
 <body>
     <div class="bodyShadow"></div>
-    
+
+    <!-- Google Calendar Integration UI -->
+    <div id="googleCalendarBar" style="text-align:center; margin-bottom:1em;">
+        <button id="googleSignInBtn" class="header-btn">Sign in with Google</button>
+        <span id="googleUserInfo" style="display:none; margin-left:1em;"></span>
+        <button id="addAllToCalendarBtn" class="header-btn" style="display:none; margin-left:1em;">Add all tests to Google Calendar</button>
+    </div>
+
     <div class="scrollHeader">
         <span id="headerTitle">Selectează clasa</span>
         <button id="backBtn" class="header-btn" style="display: none;">← Înapoi</button>
@@ -128,5 +136,4 @@
         <p>Made by Micu Vlad-Bogdan</p>
     </footer>
 </body>
-
 </html>
