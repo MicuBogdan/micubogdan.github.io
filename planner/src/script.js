@@ -253,6 +253,7 @@ function selectClass(clasa) {
     const addAllBtn = document.getElementById('addAllToCalendarBtn');
     if (addAllBtn) {
         addAllBtn.onclick = async function() {
+            console.log('[DEBUG] Google Calendar export button clicked');
             if (!window.gapi) {
                 alert('Google API is not loaded. Please check your connection or disable adblockers.');
                 console.error('Google API is not loaded');
