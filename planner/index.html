@@ -36,12 +36,12 @@
 
     <!-- Styles & scripts -->
     <link rel="stylesheet" href="src/styles.css">
-    <!-- Firebase App (core) -->
-    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
-    <!-- Firebase Analytics -->
-    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js"></script>
-    <!-- Firebase Firestore -->
-    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
+    <!-- Firebase App (core, compat) -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js"></script>
+    <!-- Firebase Analytics (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics-compat.js"></script>
+    <!-- Firebase Firestore (compat) -->
+    <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore-compat.js"></script>
     <script>
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -53,10 +53,8 @@
             appId: "1:890036064364:web:9698f148e06b58af510849",
             measurementId: "G-LPDLX8L3FR"
         };
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const analytics = firebase.analytics(app);
-        // Initialize Firestore and expose globally
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
         window.db = firebase.firestore();
     </script>
     <script src="src/script.js" defer></script>
