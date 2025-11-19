@@ -13,42 +13,55 @@ const GOOGLE_API_SCOPES = 'https://www.googleapis.com/auth/calendar.events';
 let googleAuth = null;
 let googleUser = null;
 
-// Load Google API JS client
+// Function that loads the script and its modules
 function loadGoogleApiClient() {
     return new Promise((resolve, reject) => {
-        if (window.gapi) return resolve();
+        if (window.gapi) {
+            // If the script is already there, just load the modules and use the callback
+            window.gapi.load('client:auth2', resolve); 
+            return;
+        }
+        
         const script = document.createElement('script');
         script.src = 'https://apis.google.com/js/api.js';
         script.onload = () => {
             if (!window.gapi) {
-                alert('Google API failed to load.');
-                console.error('Google API failed to load after script.onload');
+                // ... (error handling)
                 return reject(new Error('Google API failed to load'));
             }
-            window.gapi.load('client:auth2', resolve);
+            // Use the callback to ensure 'client' and 'auth2' modules are ready
+            window.gapi.load('client:auth2', resolve); 
         };
-        script.onerror = (e) => {
-            alert('Google API script failed to load. Check your network or adblockers.');
-            console.error('Google API script failed to load', e);
-            reject(e);
-        };
+        // ... (rest of onerror handling)
         document.head.appendChild(script);
     });
 }
 
+// Function that initializes the API client
 async function initGoogleAuth() {
     await loadGoogleApiClient();
+    
+    // The check you added, which failed locally, should succeed on HTTPS
+    if (!window.gapi.client) {
+        throw new Error('gapi.client object is not available after load.');
+    }
+    
+    // Final initialization (using your variables)
     await window.gapi.client.init({
         clientId: GOOGLE_CLIENT_ID,
-        scope: GOOGLE_API_SCOPES
+        scope: GOOGLE_API_SCOPES,
+        // Including discoveryDocs is good practice for the Calendar API
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'] 
     });
+    
+    // ... rest of your code to get auth instance ...
     googleAuth = window.gapi.auth2.getAuthInstance();
     if (googleAuth.isSignedIn.get()) {
         googleUser = googleAuth.currentUser.get();
     }
 }
-
 async function signInWithGoogle() {
+    alert('[DEBUG] signInWithGoogle called. gapi: ' + (typeof window.gapi) + ', gapi.auth2: ' + (window.gapi && window.gapi.auth2 ? 'yes' : 'no'));
     try {
         await initGoogleAuth();
     } catch (e) {
@@ -56,11 +69,22 @@ async function signInWithGoogle() {
         console.error('Google Auth initialization failed', e);
         throw e;
     }
+    if (!window.gapi) {
+        alert('Google API (gapi) is not available after init.');
+        console.error('Google API (gapi) is not available after init.');
+        throw new Error('Google API (gapi) is not available after init.');
+    }
+    if (!window.gapi.auth2) {
+        alert('Google API auth2 is not available after init.');
+        console.error('Google API auth2 is not available after init.');
+        throw new Error('Google API auth2 is not available after init.');
+    }
     if (!googleAuth) {
         alert('Google Auth instance not available.');
         console.error('Google Auth instance not available');
         throw new Error('Google Auth instance not available');
     }
+    alert('[DEBUG] Calling googleAuth.signIn()...');
     return googleAuth.signIn().then(user => {
         googleUser = user;
         updateGoogleUi();
