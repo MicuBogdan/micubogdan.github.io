@@ -1,3 +1,4 @@
+console.log('[DEBUG] script.js loaded and running');
 // --- Google Calendar Integration ---
 // 1. Go to https://console.cloud.google.com/apis/credentials
 // 2. Create OAuth 2.0 Client ID (type: Web application)
@@ -254,6 +255,7 @@ function selectClass(clasa) {
     if (addAllBtn) {
         addAllBtn.onclick = async function() {
             console.log('[DEBUG] Google Calendar export button clicked');
+            alert('[DEBUG] Export button handler triggered!');
             if (!window.gapi) {
                 alert('Google API is not loaded. Please check your connection or disable adblockers.');
                 console.error('Google API is not loaded');
