@@ -119,8 +119,7 @@ async function addAllTestsToGoogleCalendar() {
 
 // Show Google Calendar bar on planner screen
 function showGoogleCalendarBar() {
-    const bar = document.getElementById('googleCalendarBar');
-    if (bar) bar.style.display = 'block';
+    // No longer needed; bar is always visible
     updateGoogleUi();
 }
 
@@ -229,8 +228,8 @@ function selectClass(clasa) {
     // Load tests and activity for this class
     loadTests();
     loadActivity();
-    showGoogleCalendarBar();
-    // Google Calendar integration UI
+    updateGoogleUi();
+    // Google Calendar integration UI (always set up listeners)
     const signInBtn = document.getElementById('googleSignInBtn');
     if (signInBtn) signInBtn.addEventListener('click', signInWithGoogle);
     const addAllBtn = document.getElementById('addAllToCalendarBtn');
