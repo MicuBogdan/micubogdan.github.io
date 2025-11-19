@@ -257,11 +257,17 @@ function selectClass(clasa) {
             console.log('[DEBUG] Google Calendar export button clicked');
             alert('[DEBUG] Export button handler triggered!');
             if (!window.gapi) {
-                alert('Google API is not loaded. Please check your connection or disable adblockers.');
-                console.error('Google API is not loaded');
+                alert('Google API is not loaded! Attempting to load it now. If this fails, check your adblockers or network.');
+                // Try to force-load the script
+                const script = document.createElement('script');
+                script.src = 'https://apis.google.com/js/api.js';
+                script.onload = () => { alert('Google API script loaded. Please try again.'); };
+                script.onerror = () => { alert('Google API script failed to load.'); };
+                document.head.appendChild(script);
                 return;
             }
             if (!googleUser) {
+                alert('[DEBUG] Triggering Google sign-in flow...');
                 try {
                     await signInWithGoogle();
                 } catch (e) {
