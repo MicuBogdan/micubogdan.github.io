@@ -23,6 +23,8 @@ function initializeGisAndGapi() {
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: GOOGLE_CLIENT_ID,
                 scope: GOOGLE_API_SCOPES,
+                // FIX: Use redirect mode to bypass pop-up blockers
+                ux_mode: 'redirect',
                 callback: (tokenResponse) => {
                     // This callback fires when a token is successfully granted
                     if (tokenResponse && tokenResponse.access_token) {
@@ -33,7 +35,12 @@ function initializeGisAndGapi() {
                         
                         // Decode the token (JWT) to get user profile information
                         try {
-                            const payload = JSON.parse(atob(tokenResponse.access_token.split('.')[1]));
+                            // Note: The access token is opaque, we usually need the ID token for the profile.
+                            // For simplicity and to avoid another request, we'll try to use the access token payload
+                            // or fallback to a default name.
+                            const base64Url = tokenResponse.access_token.split('.')[1];
+                            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                            const payload = JSON.parse(atob(base64));
                             googleUserName = payload.name || payload.email || 'Utilizator Google'; 
                         } catch (e) {
                             googleUserName = 'Utilizator Google';
@@ -44,11 +51,12 @@ function initializeGisAndGapi() {
                         alert('Conectare Google reușită! Acum poți exporta testele.');
                     } else {
                          console.error('Token acquisition failed or was cancelled.', tokenResponse);
+                         alert('Conectarea a fost anulată sau a eșuat. Te rog încearcă din nou.');
                     }
                 },
                 error_callback: (error) => {
                     console.error('GIS token client error:', error);
-                    alert('Eroare la conectarea Google. Vezi consola pentru detalii.');
+                    alert('Eroare la conectarea Google. Te rog asigură-te că domeniul tău este autorizat în Google Cloud Console.');
                 }
             });
             
@@ -75,13 +83,12 @@ function initializeGisAndGapi() {
 
 // 2. Sign In (Requests the token via GIS)
 function signInWithGoogle() {
-    alert('[DEBUG] signInWithGoogle called. Using GIS flow...');
     if (!tokenClient) {
         alert('Serviciul Google Calendar nu este încărcat. Te rog așteaptă un moment.');
         return;
     }
 
-    // Use tokenClient to request the token. This triggers the popup/redirect.
+    // Use tokenClient to request the token. This triggers the redirect.
     tokenClient.requestAccessToken({ prompt: '' }); 
     // The result is handled by the tokenClient.callback function defined in initializeGisAndGapi.
 }
@@ -112,6 +119,26 @@ function updateGoogleUi() {
     } else {
         userInfo.style.display = 'none';
         addAllBtn.textContent = 'Conectează-te și exportă în Google Calendar';
+        addAllBtn.onclick = async function() {
+            console.log('[DEBUG] Google Calendar export button clicked');
+            
+            // Check if services are initialized
+            if (!tokenClient || !window.gapi || !window.gapi.client) {
+                alert('Serviciile Google nu sunt complet încărcate. Te rog așteaptă câteva secunde și încearcă din nou.');
+                return;
+            }
+            
+            // Check if user is signed in (has a token)
+            if (!googleAccessToken) {
+                console.log('[DEBUG] Triggering Google sign-in flow (GIS)...');
+                // This requests the token. The export (addAllTestsToGoogleCalendar) runs on success inside the callback.
+                signInWithGoogle();
+                return; 
+            }
+            
+            // If already signed in, export the tests
+            addAllTestsToGoogleCalendar();
+        };
         userInfo.innerHTML = '';
     }
 }
@@ -147,7 +174,6 @@ async function addAllTestsToGoogleCalendar() {
     
     for (const test of tests) {
         try {
-            // REMOVED redundant gapi.client.load('calendar', 'v3');
             const startDate = new Date(test.date);
             const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour event
             
@@ -289,7 +315,6 @@ function selectClass(clasa) {
     if (addAllBtn) {
         addAllBtn.onclick = async function() {
             console.log('[DEBUG] Google Calendar export button clicked');
-            alert('[DEBUG] Export button handler triggered!');
             
             // Check if services are initialized
             if (!tokenClient || !window.gapi || !window.gapi.client) {
@@ -299,7 +324,7 @@ function selectClass(clasa) {
             
             // Check if user is signed in (has a token)
             if (!googleAccessToken) {
-                alert('[DEBUG] Triggering Google sign-in flow (GIS)...');
+                console.log('[DEBUG] Triggering Google sign-in flow (GIS)...');
                 // This requests the token. The export (addAllTestsToGoogleCalendar) runs on success inside the callback.
                 signInWithGoogle();
                 return; 
