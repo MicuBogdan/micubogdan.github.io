@@ -9,9 +9,6 @@ let googleAccessToken = null;
 let googleUserName = null;
 let tokenClient = null; // GIS Token Client
 
-// Time Zone Fix: Get the user's local IANA time zone identifier
-let userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
-
 // 1. Initialization for GIS (Authentication) and GAPI (Calendar API)
 function initializeGisAndGapi() {
     return new Promise((resolve, reject) => {
@@ -38,6 +35,9 @@ function initializeGisAndGapi() {
                         
                         // Decode the token (JWT) to get user profile information
                         try {
+                            // Note: The access token is opaque, we usually need the ID token for the profile.
+                            // For simplicity and to avoid another request, we'll try to use the access token payload
+                            // or fallback to a default name.
                             const base64Url = tokenResponse.access_token.split('.')[1];
                             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
                             const payload = JSON.parse(atob(base64));
@@ -143,16 +143,18 @@ function updateGoogleUi() {
     }
 }
 
-// 5. Add Tests to Calendar (Time Zone Fix Applied Here)
+// 5. Add Tests to Calendar
 async function addAllTestsToGoogleCalendar() {
+    // Check for access token instead of googleUser
     if (!googleAccessToken) return alert('Te rog conectează-te cu Google întâi!');
     
+    // Get all tests for current class
     const result = await window.storage.list(`tests:${currentClass}:`, true);
     if (!result || !result.keys || result.keys.length === 0) {
         alert('Nu există teste de exportat!');
         return;
     }
-    
+    // Get all test objects
     const tests = [];
     for (const key of result.keys) {
         try {
@@ -163,36 +165,25 @@ async function addAllTestsToGoogleCalendar() {
             }
         } catch (err) {}
     }
-    
     if (tests.length === 0) {
         alert('Nu există teste de exportat!');
         return;
     }
-    
+    // Add each test as a calendar event
     let success = 0, fail = 0;
     
     for (const test of tests) {
         try {
-            const dateString = test.date; // e.g., '2025-11-20'
-
-            // FIX: Construct the datetime string and specify the user's local timezone.
-            // This forces the event to be scheduled at 8:00 AM local time.
-            const startDateTime = `${dateString}T08:00:00`; // 8:00 AM start
-            const endDateTime = `${dateString}T09:00:00`;   // 9:00 AM end (1 hour duration)
+            const startDate = new Date(test.date);
+            const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // 1 hour event
             
             await window.gapi.client.calendar.events.insert({
                 calendarId: 'primary',
                 resource: {
-                    summary: `TEST: ${test.subject}`,
+                    summary: test.subject,
                     description: test.details || '',
-                    start: { 
-                        dateTime: startDateTime, 
-                        timeZone: userTimeZone // Use the user's current zone
-                    },
-                    end: { 
-                        dateTime: endDateTime,
-                        timeZone: userTimeZone
-                    }
+                    start: { dateTime: startDate.toISOString() },
+                    end: { dateTime: endDate.toISOString() }
                 }
             });
             success++;
