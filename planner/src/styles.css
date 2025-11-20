@@ -124,11 +124,6 @@ footer {
 
 /* Class Selection Buttons */
 .butoane-clase-coloana {
-    text-align: center;
-    width: 90%;
-    max-width: 600px;
-    margin: 0 auto;
-.butoane-clase-coloana {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -154,7 +149,7 @@ footer {
     outline: none;
     min-width: 4.2em;
     margin: 0.3em;
-}
+    -webkit-tap-highlight-color: transparent;
 }
 
 .clasa-btn:hover, .clasa-btn:focus {
@@ -285,7 +280,7 @@ footer {
     margin-top: 0.5em;
 }
 
-.delete-test-btn {
+.delete-test-btn, .export-test-btn {
     background: #d32f2f;
     color: white;
     border: none;
@@ -295,10 +290,19 @@ footer {
     cursor: pointer;
     transition: all 0.2s;
     margin-top: 0.5em;
+    margin-right: 0.5em;
+}
+
+.export-test-btn {
+    background: #1976d2;
 }
 
 .delete-test-btn:hover {
     background: #b71c1c;
+}
+
+.export-test-btn:hover {
+    background: #1565c0;
 }
 
 /* Activity Log */
@@ -315,7 +319,8 @@ footer {
     color: #4d0003;
     margin-bottom: 1em;
     font-size: 1.2em;
-    sticky: top 0;
+    position: sticky;
+    top: 0;
     background: #fff;
     padding-bottom: 0.5em;
 }
@@ -408,6 +413,7 @@ footer {
         height: 300px;
     }
 }
+
 @media (max-width: 600px) {
     .scrollHeader {
         left: 0;
