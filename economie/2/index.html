@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recapitulare Economie - Clasa a XI-a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #fdfbf7; color: #1f2937; }
+        .chart-container { position: relative; width: 100%; max-width: 600px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .nav-active { border-bottom: 2px solid #ea580c; color: #ea580c; font-weight: 600; }
+        .hidden-section { display: none; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Sand/Off-white) with Academic Orange and Slate Blue accents for focus and clarity. -->
+    <!-- Application Structure Plan: 
+         Structure: Tab-based Dashboard.
+         Reasoning: The material is distinctively divided into 4 chapters. A tabbed view allows the student to focus on one topic at a time (chunking information) without scrolling fatigue.
+         Key Sections:
+         1. Proprietate & Inițiativă: Interactive cards for rights and alienation types.
+         2. Oferta: Dynamic Supply simulator (buttons to change factors, Chart.js visualizes the shift).
+         3. Factori de Producție: Comparison toggle for Capital types and card grid for main factors.
+         4. Formule & Calculator: Interactive inputs to test the math (Input Q, L -> Get Productivity).
+    -->
+    <!-- Visualization & Content Choices:
+         1. Oferta Elasticity: Line Chart (Chart.js) showing 3 slopes (Elastic, Inelastic, Unitary) to visualize sensitivity.
+         2. Capital Comparison: Interactive HTML Table/Grid that highlights differences on hover/toggle. No SVG needed.
+         3. Supply Factors: Bar Chart (Chart.js) acting as a visual gauge. Clicking a factor updates the bar height to represent Supply increasing or decreasing.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-[#fdfbf7] min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-stone-800">📊 Economie <span class="text-orange-600">XI</span></span>
+                </div>
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="switchTab('proprietate')" id="nav-proprietate" class="nav-btn nav-active px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-600 transition">Proprietatea</button>
+                    <button onclick="switchTab('oferta')" id="nav-oferta" class="nav-btn px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-600 transition">Oferta</button>
+                    <button onclick="switchTab('factori')" id="nav-factori" class="nav-btn px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-600 transition">Factori Producție</button>
+                    <button onclick="switchTab('formule')" id="nav-formule" class="nav-btn px-3 py-2 text-sm font-medium text-stone-600 hover:text-orange-600 transition">Formule & Calcul</button>
+                </nav>
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden flex items-center">
+                    <button onclick="toggleMobileMenu()" class="text-stone-600 hover:text-stone-900 focus:outline-none">
+                        <span class="text-2xl">☰</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Nav -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-stone-100 p-4 space-y-2 shadow-lg absolute w-full">
+            <button onclick="switchTab('proprietate')" class="block w-full text-left px-3 py-2 rounded-md hover:bg-orange-50 text-stone-700 font-medium">Proprietatea</button>
+            <button onclick="switchTab('oferta')" class="block w-full text-left px-3 py-2 rounded-md hover:bg-orange-50 text-stone-700 font-medium">Oferta</button>
+            <button onclick="switchTab('factori')" class="block w-full text-left px-3 py-2 rounded-md hover:bg-orange-50 text-stone-700 font-medium">Factori Producție</button>
+            <button onclick="switchTab('formule')" class="block w-full text-left px-3 py-2 rounded-md hover:bg-orange-50 text-stone-700 font-medium">Formule & Calcul</button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- SECTION 1: PROPRIETATEA -->
+        <section id="proprietate" class="tab-content fade-in">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Proprietatea și Libera Inițiativă</h2>
+                <p class="text-stone-600 max-w-2xl mx-auto">
+                    În această secțiune explorăm fundamentul economiei de piață: relația dintre oameni și bunuri. 
+                    Vei învăța despre drepturile proprietarului, modurile de înstrăinare a bunurilor și formele de proprietate.
+                </p>
+            </div>
+
+            <!-- Cards: Drepturile Proprietarului -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 card-hover transition cursor-pointer group">
+                    <div class="text-orange-600 text-xl font-bold mb-2">1. Posesia</div>
+                    <p class="text-stone-600 group-hover:text-stone-800 transition">Stăpânirea efectivă a bunului.</p>
+                    <p class="text-xs text-stone-400 mt-2 italic">"A avea bunul în mână"</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 card-hover transition cursor-pointer group">
+                    <div class="text-orange-600 text-xl font-bold mb-2">2. Dispoziția</div>
+                    <p class="text-stone-600 group-hover:text-stone-800 transition">Puterea de a decide soarta bunului.</p>
+                    <p class="text-xs text-stone-400 mt-2 italic">A vinde, a dona, a distruge</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 card-hover transition cursor-pointer group">
+                    <div class="text-orange-600 text-xl font-bold mb-2">3. Folosința</div>
+                    <p class="text-stone-600 group-hover:text-stone-800 transition">Utilizarea bunului pentru satisfacerea nevoilor.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 card-hover transition cursor-pointer group">
+                    <div class="text-orange-600 text-xl font-bold mb-2">4. Uzufructul</div>
+                    <p class="text-stone-600 group-hover:text-stone-800 transition">Dreptul de a culege roadele/beneficiile.</p>
+                    <p class="text-xs text-stone-400 mt-2 italic">Ex: Chiria încasată</p>
+                </div>
+            </div>
+
+            <!-- Interactive Diagram: Alienation -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white p-8 rounded-xl shadow-md border-l-4 border-blue-500">
+                    <h3 class="text-xl font-bold text-stone-800 mb-4">Forme de Înstrăinare</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100 transition" onclick="toggleDetail('totala')">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-blue-800">Înstrăinare Totală</span>
+                                <span class="text-blue-500 text-xl">↓</span>
+                            </div>
+                            <div id="detail-totala" class="hidden mt-3 text-sm text-blue-700 pl-4 border-l-2 border-blue-300">
+                                <p><strong>Cu contraechivalent:</strong> Vânzare-cumpărare.</p>
+                                <p><strong>Fără contraechivalent:</strong> Donație, moștenire.</p>
+                            </div>
+                        </div>
+                        <div class="p-4 bg-indigo-50 rounded-lg cursor-pointer hover:bg-indigo-100 transition" onclick="toggleDetail('partiala')">
+                            <div class="flex justify-between items-center">
+                                <span class="font-bold text-indigo-800">Înstrăinare Parțială</span>
+                                <span class="text-indigo-500 text-xl">↓</span>
+                            </div>
+                            <div id="detail-partiala" class="hidden mt-3 text-sm text-indigo-700 pl-4 border-l-2 border-indigo-300">
+                                <p>Se cedează doar folosința sau uzufructul temporar.</p>
+                                <p class="italic">Exemple: Închiriere, Concesionare, Arendare.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-stone-100 p-8 rounded-xl border border-stone-200">
+                    <h3 class="text-xl font-bold text-stone-800 mb-4">Libera Inițiativă</h3>
+                    <p class="mb-4 text-stone-700">
+                        Libertatea agenților economici de a acționa și de a-și administra resursele cum doresc, în limitele legii.
+                    </p>
+                    <div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-inner">
+                        <div class="text-center">
+                            <span class="block text-4xl mb-2">⚖️</span>
+                            <span class="font-bold text-stone-800">Libertate + Responsabilitate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: OFERTA -->
+        <section id="oferta" class="tab-content hidden-section fade-in">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Oferta</h2>
+                <p class="text-stone-600 max-w-2xl mx-auto">
+                    Analizează comportamentul producătorului pe piață. 
+                    Interacționează cu factorii de influență pentru a vedea cum reacționează oferta și vizualizează elasticitatea.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left: Factors Interactive List -->
+                <div class="lg:col-span-1 bg-white p-6 rounded-xl shadow-sm border border-stone-200 h-fit">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4 border-b pb-2">Factori de Influență</h3>
+                    <p class="text-xs text-stone-500 mb-4">Selectează un factor pentru a vedea efectul:</p>
+                    <div class="space-y-2">
+                        <button onclick="updateSupply('pret')" class="w-full text-left p-3 rounded bg-stone-50 hover:bg-orange-100 border border-transparent hover:border-orange-300 transition text-sm font-medium">💰 Prețul</button>
+                        <button onclick="updateSupply('cost')" class="w-full text-left p-3 rounded bg-stone-50 hover:bg-orange-100 border border-transparent hover:border-orange-300 transition text-sm font-medium">🏭 Costul de producție</button>
+                        <button onclick="updateSupply('nr')" class="w-full text-left p-3 rounded bg-stone-50 hover:bg-orange-100 border border-transparent hover:border-orange-300 transition text-sm font-medium">👥 Nr. de producători</button>
+                        <button onclick="updateSupply('taxe')" class="w-full text-left p-3 rounded bg-stone-50 hover:bg-orange-100 border border-transparent hover:border-orange-300 transition text-sm font-medium">📉 Taxe / Impozite</button>
+                        <button onclick="updateSupply('subventii')" class="w-full text-left p-3 rounded bg-stone-50 hover:bg-orange-100 border border-transparent hover:border-orange-300 transition text-sm font-medium">🎁 Subvenții</button>
+                    </div>
+                </div>
+
+                <!-- Middle: Reaction Display -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-lg font-bold text-stone-800 mb-4">Simulare Impact</h3>
+                    <div id="supply-reaction-box" class="flex flex-col items-center justify-center h-64 bg-stone-50 rounded-lg border-2 border-dashed border-stone-200 transition-all duration-300">
+                        <p class="text-stone-400">Selectează un factor din stânga.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Elasticity Section -->
+            <div class="mt-12">
+                <h3 class="text-2xl font-bold text-stone-800 mb-6 text-center">Elasticitatea Ofertei (K eo/p)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div class="text-center p-4 bg-green-50 rounded-lg border border-green-200">
+                        <div class="text-xl font-bold text-green-700">> 1</div>
+                        <div class="font-bold text-green-900">Elastică</div>
+                        <div class="text-xs text-green-800">Oferta reacționează puternic la preț.</div>
+                    </div>
+                    <div class="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <div class="text-xl font-bold text-yellow-700">= 1</div>
+                        <div class="font-bold text-yellow-900">Unitară</div>
+                        <div class="text-xs text-yellow-800">Modificare procentuală identică.</div>
+                    </div>
+                    <div class="text-center p-4 bg-red-50 rounded-lg border border-red-200">
+                        <div class="text-xl font-bold text-red-700">< 1</div>
+                        <div class="font-bold text-red-900">Inelastică</div>
+                        <div class="text-xs text-red-800">Oferta reacționează slab.</div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-stone-200">
+                    <div class="chart-container">
+                        <canvas id="elasticityChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-stone-400 mt-2">Reprezentare grafică a pantelor curbei de ofertă pentru diferite tipuri de elasticitate.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: FACTORI DE PRODUCȚIE -->
+        <section id="factori" class="tab-content hidden-section fade-in">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Factorii de Producție</h2>
+                <p class="text-stone-600 max-w-2xl mx-auto">
+                    Resursele atrase și utilizate în activitatea economică. Aici comparăm tipurile de capital și definim rolul muncii și al naturii.
+                </p>
+            </div>
+
+            <!-- Main Factors Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white p-6 rounded-t-xl border-t-4 border-orange-500 shadow-sm">
+                    <div class="text-4xl mb-3">👷‍♂️</div>
+                    <h3 class="text-xl font-bold mb-2">Munca</h3>
+                    <span class="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded-full mb-2">Factor Activ</span>
+                    <p class="text-sm text-stone-600">Efortul conștient, fizic și intelectual. Este factorul determinant al producției.</p>
+                </div>
+                <div class="bg-white p-6 rounded-t-xl border-t-4 border-green-500 shadow-sm">
+                    <div class="text-4xl mb-3">🌱</div>
+                    <h3 class="text-xl font-bold mb-2">Natura</h3>
+                    <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full mb-2">Factor Primar</span>
+                    <p class="text-sm text-stone-600">Totalitatea resurselor neprelucrate (pământ, apă, minereuri).</p>
+                </div>
+                <div class="bg-white p-6 rounded-t-xl border-t-4 border-blue-500 shadow-sm">
+                    <div class="text-4xl mb-3">⚙️</div>
+                    <h3 class="text-xl font-bold mb-2">Capitalul</h3>
+                    <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full mb-2">Factor Derivat</span>
+                    <p class="text-sm text-stone-600">Bunuri rezultate din producție, folosite pentru a produce alte bunuri.</p>
+                </div>
+            </div>
+
+            <!-- Interactive Comparison: Capital -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-stone-200">
+                <div class="bg-stone-800 p-4 text-white flex justify-between items-center">
+                    <h3 class="font-bold text-lg">Comparație Capital: Fix vs. Circulant</h3>
+                    <span class="text-xs text-stone-300">Treceți cu mouse-ul peste rânduri</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-stone-100 text-stone-600 text-sm uppercase tracking-wider">
+                                <th class="p-4 border-b">Caracteristica</th>
+                                <th class="p-4 border-b text-blue-700">Capital Fix (K. fix)</th>
+                                <th class="p-4 border-b text-teal-700">Capital Circulant (K. circ)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm">
+                            <tr class="hover:bg-orange-50 transition border-b border-stone-100">
+                                <td class="p-4 font-medium text-stone-800">Exemple</td>
+                                <td class="p-4 text-stone-600">Clădiri, utilaje, mașini.</td>
+                                <td class="p-4 text-stone-600">Materii prime, combustibil.</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50 transition border-b border-stone-100">
+                                <td class="p-4 font-medium text-stone-800">Cicluri de producție</td>
+                                <td class="p-4 font-bold text-blue-600">Mai multe cicluri</td>
+                                <td class="p-4 font-bold text-teal-600">Un singur ciclu</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50 transition border-b border-stone-100">
+                                <td class="p-4 font-medium text-stone-800">Mod de consum</td>
+                                <td class="p-4 text-stone-600">Treptat (ani de zile).</td>
+                                <td class="p-4 text-stone-600">Dintr-o dată / se transformă.</td>
+                            </tr>
+                            <tr class="hover:bg-orange-50 transition border-b border-stone-100">
+                                <td class="p-4 font-medium text-stone-800">Uzură</td>
+                                <td class="p-4 text-red-500 font-bold">DA (Fizică și Morală)</td>
+                                <td class="p-4 text-green-500 font-bold">NU</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: FORMULE & CALCULATOR -->
+        <section id="formule" class="tab-content hidden-section fade-in">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-stone-800 mb-2">Formule Esențiale</h2>
+                <p class="text-stone-600 max-w-2xl mx-auto">
+                    Instrumente de calcul pentru productivitate și elasticitate. Introdu valori pentru a vedea cum funcționează formulele în timp real.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Calculator 1: Wm (Average) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-lg font-bold text-stone-800 border-b pb-2 mb-4">Productivitatea Medie (W<sub>M</sub>)</h3>
+                    <div class="bg-orange-50 p-3 rounded mb-4 text-center text-orange-800 font-mono text-lg">
+                        W<sub>M</sub> = Q / x
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-stone-500 uppercase">Producția Totală (Q)</label>
+                            <input type="number" id="calc-wm-q" class="w-full mt-1 p-2 border border-stone-300 rounded focus:ring-2 focus:ring-orange-500 outline-none" placeholder="Ex: 1000">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-500 uppercase">Cantitate Factor (x)</label>
+                            <input type="number" id="calc-wm-x" class="w-full mt-1 p-2 border border-stone-300 rounded focus:ring-2 focus:ring-orange-500 outline-none" placeholder="Ex: 10">
+                        </div>
+                        <button onclick="calculateWm()" class="w-full bg-stone-800 text-white py-2 rounded hover:bg-stone-900 transition">Calculează</button>
+                        <div id="result-wm" class="hidden p-4 bg-green-50 text-green-800 rounded text-center font-bold"></div>
+                    </div>
+                </div>
+
+                <!-- Calculator 2: Wm (Marginal) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-200">
+                    <h3 class="text-lg font-bold text-stone-800 border-b pb-2 mb-4">Productivitatea Marginală (W<sub>m</sub>)</h3>
+                    <div class="bg-blue-50 p-3 rounded mb-4 text-center text-blue-800 font-mono text-lg">
+                        W<sub>m</sub> = ΔQ / Δx
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-stone-500">Q1 (Final)</label>
+                            <input type="number" id="calc-wmg-q1" class="w-full mt-1 p-2 border border-stone-300 rounded outline-none" placeholder="1200">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-500">Q0 (Inițial)</label>
+                            <input type="number" id="calc-wmg-q0" class="w-full mt-1 p-2 border border-stone-300 rounded outline-none" placeholder="1000">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-500">x1 (Final)</label>
+                            <input type="number" id="calc-wmg-x1" class="w-full mt-1 p-2 border border-stone-300 rounded outline-none" placeholder="12">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-stone-500">x0 (Inițial)</label>
+                            <input type="number" id="calc-wmg-x0" class="w-full mt-1 p-2 border border-stone-300 rounded outline-none" placeholder="10">
+                        </div>
+                    </div>
+                    <button onclick="calculateWmg()" class="w-full mt-4 bg-stone-800 text-white py-2 rounded hover:bg-stone-900 transition">Calculează</button>
+                    <div id="result-wmg" class="hidden mt-4 p-4 bg-green-50 text-green-800 rounded text-center font-bold"></div>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-stone-100 p-6 rounded-xl border border-stone-200">
+                 <h3 class="text-lg font-bold text-stone-800 mb-2">Coeficientul Elasticității Ofertei (K<sub>eo/p</sub>)</h3>
+                 <p class="mb-4 text-sm text-stone-600">Formula de bază pentru a determina tipul de elasticitate:</p>
+                 <div class="bg-white p-4 rounded shadow-inner text-center font-mono text-stone-800">
+                     K<sub>eo/p</sub> = %ΔO / %ΔP
+                 </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-stone-200 py-6 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-stone-500 text-sm">Generat pentru recapitulare școlară • Clasa a XI-a</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Navigation Logic ---
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.tab-content').forEach(section => {
+                section.classList.add('hidden-section');
+            });
+            // Show selected section
+            document.getElementById(tabId).classList.remove('hidden-section');
+            
+            // Update Navigation UI
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('nav-active');
+            });
+            const activeNav = document.getElementById('nav-' + tabId);
+            if(activeNav) activeNav.classList.add('nav-active');
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        // --- Interaction: Alienation Details ---
+        function toggleDetail(id) {
+            const detail = document.getElementById('detail-' + id);
+            if (detail.classList.contains('hidden')) {
+                detail.classList.remove('hidden');
+            } else {
+                detail.classList.add('hidden');
+            }
+        }
+
+        // --- Interaction: Supply Factors Simulator ---
+        function updateSupply(factor) {
+            const box = document.getElementById('supply-reaction-box');
+            let content = '';
+            let borderColor = 'border-stone-200';
+            let bgColor = 'bg-stone-50';
+
+            switch(factor) {
+                case 'pret':
+                    content = `<div class="text-center"><div class="text-3xl mb-2">📈</div><h4 class="font-bold text-green-700">Relație Pozitivă (+)</h4><p class="text-sm mt-2">Prețul crește ⬆️ <br> Oferta crește ⬆️</p></div>`;
+                    borderColor = 'border-green-300';
+                    bgColor = 'bg-green-50';
+                    break;
+                case 'cost':
+                    content = `<div class="text-center"><div class="text-3xl mb-2">📉</div><h4 class="font-bold text-red-700">Relație Negativă (-)</h4><p class="text-sm mt-2">Costurile cresc ⬆️ <br> Oferta scade ⬇️</p></div>`;
+                    borderColor = 'border-red-300';
+                    bgColor = 'bg-red-50';
+                    break;
+                case 'nr':
+                    content = `<div class="text-center"><div class="text-3xl mb-2">🏭</div><h4 class="font-bold text-green-700">Relație Pozitivă (+)</h4><p class="text-sm mt-2">Mai mulți producători ⬆️ <br> Oferta crește ⬆️</p></div>`;
+                    borderColor = 'border-green-300';
+                    bgColor = 'bg-green-50';
+                    break;
+                case 'taxe':
+                    content = `<div class="text-center"><div class="text-3xl mb-2">🏛️</div><h4 class="font-bold text-red-700">Relație Negativă (-)</h4><p class="text-sm mt-2">Taxele cresc ⬆️ <br> Oferta scade ⬇️</p></div>`;
+                    borderColor = 'border-red-300';
+                    bgColor = 'bg-red-50';
+                    break;
+                case 'subventii':
+                    content = `<div class="text-center"><div class="text-3xl mb-2">🎁</div><h4 class="font-bold text-green-700">Relație Pozitivă (+)</h4><p class="text-sm mt-2">Subvenții acordate ⬆️ <br> Oferta crește ⬆️</p></div>`;
+                    borderColor = 'border-green-300';
+                    bgColor = 'bg-green-50';
+                    break;
+            }
+
+            box.innerHTML = content;
+            box.className = `flex flex-col items-center justify-center h-64 rounded-lg border-2 ${borderColor} ${bgColor} transition-all duration-300`;
+        }
+
+        // --- Interaction: Calculator Logic ---
+        function calculateWm() {
+            const Q = parseFloat(document.getElementById('calc-wm-q').value);
+            const x = parseFloat(document.getElementById('calc-wm-x').value);
+            const resultDiv = document.getElementById('result-wm');
+
+            if (isNaN(Q) || isNaN(x) || x === 0) {
+                resultDiv.innerText = "Te rog introdu valori valide (x ≠ 0).";
+                resultDiv.classList.remove('hidden', 'bg-green-50', 'text-green-800');
+                resultDiv.classList.add('bg-red-50', 'text-red-800');
+            } else {
+                const wm = (Q / x).toFixed(2);
+                resultDiv.innerText = `Productivitatea Medie = ${wm} unități/factor`;
+                resultDiv.classList.remove('hidden', 'bg-red-50', 'text-red-800');
+                resultDiv.classList.add('bg-green-50', 'text-green-800');
+            }
+            resultDiv.classList.remove('hidden');
+        }
+
+        function calculateWmg() {
+            const Q1 = parseFloat(document.getElementById('calc-wmg-q1').value);
+            const Q0 = parseFloat(document.getElementById('calc-wmg-q0').value);
+            const x1 = parseFloat(document.getElementById('calc-wmg-x1').value);
+            const x0 = parseFloat(document.getElementById('calc-wmg-x0').value);
+            const resultDiv = document.getElementById('result-wmg');
+
+            if (isNaN(Q1) || isNaN(Q0) || isNaN(x1) || isNaN(x0) || (x1 - x0) === 0) {
+                resultDiv.innerText = "Te rog introdu valori valide (x1 ≠ x0).";
+                resultDiv.classList.remove('hidden', 'bg-green-50', 'text-green-800');
+                resultDiv.classList.add('bg-red-50', 'text-red-800');
+            } else {
+                const deltaQ = Q1 - Q0;
+                const deltaX = x1 - x0;
+                const wmg = (deltaQ / deltaX).toFixed(2);
+                resultDiv.innerText = `Productivitatea Marginală = ${wmg}`;
+                resultDiv.classList.remove('hidden', 'bg-red-50', 'text-red-800');
+                resultDiv.classList.add('bg-green-50', 'text-green-800');
+            }
+            resultDiv.classList.remove('hidden');
+        }
+
+        // --- Chart Initialization (Elasticity) ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('elasticityChart').getContext('2d');
+            
+            // Mock data for elasticity curves
+            // Inelastic: Steep slope (Price changes a lot, Qty changes little)
+            // Elastic: Flat slope (Price changes little, Qty changes a lot)
+            // Unitary: 45 degree angle
+            
+            const labels = [0, 10, 20, 30, 40, 50];
+            
+            const elasticityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Elastică (>1)',
+                            data: [10, 25, 40, 55, 70, 85], // Flatter relative to price axis (if P is y)
+                            borderColor: 'rgb(34, 197, 94)', // Green
+                            tension: 0.1,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Unitară (=1)',
+                            data: [0, 10, 20, 30, 40, 50], // proportional
+                            borderColor: 'rgb(234, 179, 8)', // Yellow
+                            tension: 0.1,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Inelastică (<1)',
+                            data: [0, 5, 10, 15, 20, 25], // Steep relative to P (low Q change)
+                            borderColor: 'rgb(239, 68, 68)', // Red
+                            tension: 0.1,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    },
+                    scales: {
+                        y: {
+                            title: { display: true, text: 'Cantitate Oferită (Q)' },
+                            beginAtZero: true
+                        },
+                        x: {
+                            title: { display: true, text: 'Preț (P) - (Indexat)' }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
