@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RomVogue - Croitorie și Confecții la Comandă</title>
+    
+    <meta name="description" content="RomVogue | Fabrica de haine - Locul in care ideile tale prind contur!">
+    <meta name="keywords" content="croitorie, retusuri haine, confectii la comanda, RomVogue, atelier croitorie, haine la comanda">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="RomVogue - Fabrica de Haine">
+    <meta property="og:description" content="RomVogue | Fabrica de haine - Locul in care ideile tale prind contur!">
+
+    <!-- Schema.org JSON-LD (Organizație) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "RomVogue",
+      "url": "https://romvogue.ro",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "telephone": "+40766475700",
+        "contactType": "customer service"
+      }
+    }
+    </script>
+
+    <!-- Bootstrap 5 CSS (via CDN pentru viteză) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Fonturi Google (pentru un aspect premium) -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS Personalizat -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="text-center">
+            <h1 class="display-4 fw-bold text-white">ROMVOGUE</h1>
+            <p class="text-white-50 lead">Fabrica de haine</p>
+        </div>
+    </div>
+
+    <!-- Elemente Decorative Fundal -->
+    <div class="decorative-blob blob-1"></div>
+    <div class="decorative-blob blob-2"></div>
+
+    <!-- Navigație -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">ROMVOGUE</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link active" href="#heroCarousel">Acasă</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#servicii">Servicii</a></li>
+                    <li class="nav-item"><a class="nav-link" href="./catalog/">Catalog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#despre">Despre Noi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Banner Principal) -->
+    <header id="heroCarousel" class="carousel slide carousel-fade mb-0" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <!-- Slide 1: Croitorie -->
+            <div class="carousel-item active hero-slide" data-bs-interval="10000">
+                <div class="hero-bg-animated" style="background-image: url('./carusel/2.jpg');"></div>
+                <div class="hero-overlay d-flex align-items-center justify-content-start text-start text-white">
+                    <div class="container">
+                        <span class="d-block text-uppercase fw-bold mb-2 text-gold ls-2">RomVogue: Lansează-ți Brand-ul.</span>
+                        <h1 class="display-4 fw-bold mb-3">De la schiță la realitate!</h1>
+                        <p class="lead mb-4">Transformă-ți schițele în realitate cu soluțiile noastre complete, dedicate brandurilor de haine la început de drum.</p>
+                        <a href="#contact" class="btn btn-gold btn-lg px-5">Contactează-ne</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 2: Retușuri -->
+            <div class="carousel-item hero-slide" data-bs-interval="10000">
+                <div class="hero-bg-animated" style="background-image: url('./carusel/3.jpg');"></div>
+                <div class="hero-overlay d-flex align-items-center justify-content-center text-center text-white">
+                    <div class="container">
+                        <span class="d-block text-uppercase fw-bold mb-2 text-gold ls-2">RomVogue: Calitate și Precizie</span>
+                        <h1 class="display-4 fw-bold mb-3">Producție la standarde înalte</h1>
+                        <p class="lead mb-4">Pentru brandurile care pun preț pe detalii, oferim servicii complete de producție vestimentară. Asigurăm consistență, finisaje premium și respectarea termenelor, pentru ca tu să te concentrezi pe creșterea afacerii tale.</p>
+                        <a href="#servicii" class="btn btn-gold btn-lg px-5">Vezi Serviciile</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Slide 3: Consultanță -->
+            <div class="carousel-item hero-slide" data-bs-interval="10000">
+                <div class="hero-bg-animated" style="background-image: url('./carusel/1.jpg');"></div>
+                <div class="hero-overlay d-flex align-items-center justify-content-end text-end text-white">
+                    <div class="container">
+                        <span class="d-block text-uppercase fw-bold mb-2 text-gold ls-2">RomVogue: Posibilități Nelimitate.</span>
+                        <h1 class="display-4 fw-bold mb-3">Articole vestimentare personalizate</h1>
+                        <p class="lead mb-4">Personalizează Blank-urile noastre Premium pentru a-ți evidenția brandul.</p>
+                        <a href="#contact" class="btn btn-gold btn-lg px-5">Contactează-ne</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Butoane Navigare -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Înapoi</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Înainte</span>
+        </button>
+
+        <!-- SVG Wave Divider (Curba de jos) -->
+        <div class="custom-shape-divider-bottom-1680000000">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+                <path d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,224C672,245,768,267,864,250.7C960,235,1056,181,1152,165.3C1248,149,1344,171,1392,181.3L1440,192L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z" class="shape-fill"></path>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Secțiune Servicii -->
+    <main class="container reveal" id="servicii">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold display-6">Serviciile noastre</h2>
+        </div>
+
+        <div class="row g-4 mobile-scroll-container">
+            <!-- Serviciu 1 -->
+            <div class="col-lg-3 col-md-6 col-sm-6 mobile-scroll-item">
+                <div class="card service-card h-100 border-0">
+                    <!-- Fundal Imagine -->
+                    <div class="service-bg" style="background-image: url('./servicii/1.jpg');"></div>
+                    <div class="card-body text-center p-4">
+                        <h5 class="card-title fw-bold mb-3">Proiectare vestimentară</h5>
+                        <p class="card-text text-muted mb-4">Transformarea schițelor tale în tipare profesionale, gata de producție.</p>
+                        <a href="#contact" class="btn btn-link text-decoration-none text-dark fw-bold p-0">
+                            Află mai multe &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Serviciu 2 -->
+            <div class="col-lg-3 col-md-6 col-sm-6 mobile-scroll-item">
+                <div class="card service-card h-100 border-0">
+                    <div class="service-bg" style="background-image: url('./servicii/2.png');"></div>
+                    <div class="card-body text-center p-4">
+                        <h5 class="card-title fw-bold mb-3">Croire, asamblare, finisare</h5>
+                        <p class="card-text text-muted mb-4">Procesul complet de producție după stabilirea modelului zero!</p>
+                        <a href="#contact" class="btn btn-link text-decoration-none text-dark fw-bold p-0">
+                            Află mai multe &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Serviciu 3 -->
+            <div class="col-lg-3 col-md-6 col-sm-6 mobile-scroll-item">
+                <div class="card service-card h-100 border-0">
+                    <div class="service-bg" style="background-image: url('./servicii/3.jpg');"></div>
+                    <div class="card-body text-center p-4">
+                        <h5 class="card-title fw-bold mb-3">Personalizare/împachetare</h5>
+                        <p class="card-text text-muted mb-4">Personalizarea hainelor tale prin transfer termic/broderie sau/și împachetarea hainelor tale în ambalajul dorit!</p>
+                        <a href="#contact" class="btn btn-link text-decoration-none text-dark fw-bold p-0">
+                            Află mai multe &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Serviciu 4 (Nou) -->
+            <div class="col-lg-3 col-md-6 col-sm-6 mobile-scroll-item">
+                <div class="card service-card h-100 border-0">
+                    <div class="service-bg" style="background-image: url('./servicii/4.jpg');"></div>
+                    <div class="card-body text-center p-4">
+                        <h5 class="card-title fw-bold mb-3">Blank-uri</h5>
+                        <p class="card-text text-muted mb-4">Evidențiază brandul tău cu Blank-urile noastre realizate din materiale premium!</p>
+                        <a href="#contact" class="btn btn-link text-decoration-none text-dark fw-bold p-0">
+                            Află mai multe &rarr;
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Secțiune De Ce Noi? -->
+    <section id="de-ce-noi" class="py-5 bg-light reveal" style="background-color: #eae7df !important;">
+        <div class="container">
+            <div class="row align-items-center">
+                <!-- Stânga: Motive (Grilă 2x2) -->
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <div class="row g-4">
+                        <div class="col-12 col-sm-6">
+                            <div class="reason-card p-4 h-100">
+                                <h5 class="fw-bold text-gold mb-2">Sustenabilitate</h5>
+                                <p class="small text-muted mb-0 transition-text">Ne străduim să construim un viitor sustenabil pentru industria modei și pentru lumea înconjurătoare.</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="reason-card p-4 h-100">
+                                <h5 class="fw-bold text-gold mb-2">Consultanță</h5>
+                                <p class="small text-muted mb-0 transition-text">Suntem alături de tine! Îți răspundem întrebărilor legate de procesul de producție și procurarea materialelor de cea mai bună calitate!</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="reason-card p-4 h-100">
+                                <h5 class="fw-bold text-gold mb-2">Inovație</h5>
+                                <p class="small text-muted mb-0 transition-text">Ne străduim ca în procesul de producție să folosim echipamente și tehnici cât mai avansate, pentru o calitate superioară!</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-6">
+                            <div class="reason-card p-4 h-100">
+                                <h5 class="fw-bold text-gold mb-2">Parteneriat de succes</h5>
+                                <p class="small text-muted mb-0 transition-text">Parteneriatele noastre nu se opresc la livrarea produselor - ele se extind într-o călătorie de succes comun.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Dreapta: Hero Content -->
+                <div class="col-lg-6 ps-lg-5 text-center text-lg-start">
+                    <h2 class="display-6 fw-bold mb-3">
+                        Află mai multe despre
+                        <div class="dynamic-wrapper text-gold">
+                            <span id="typewriter-text"></span><span class="typewriter-cursor">|</span>
+                        </div>
+                    </h2>
+                    <p class="lead text-muted mb-4">
+                        Alegând RomVogue, alegi o echipă care înțelege și îmbrățișează viziunea unică a proiectului tău, aducând-o la viață cu pasiune și experiență.
+                    </p>
+                    <a href="#contact" class="btn btn-gold btn-lg px-5 mt-3">Contactează-ne</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secțiune Despre Noi -->
+    <section id="despre" class="py-5 bg-light reveal">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <div class="moodboard-wrapper">
+                        <!-- Imagine reprezentativă -->
+                        <img src="./about/1.png" alt="Despre Noi" class="img-fluid w-100 moodboard-image" loading="lazy">
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="ps-lg-5">
+                        <div class="mb-4">
+                            <h2 class="fw-bold display-6">Despre noi</h2>
+                        </div>
+                        <p class="lead text-muted mb-4">Suntem partenerul tău de încredere în industria textilă, oferind calitate superioară și atenție la detalii.</p>
+                        <p class="mb-4">Cu o experiență vastă în domeniu, atelierul nostru este echipat pentru a gestiona comenzi diverse, de la unicate la serii mari. Ne mândrim cu flexibilitatea noastră.</p>
+                        
+                        <div class="d-flex align-items-center flex-wrap mt-4">
+                            <h4 class="mb-0 me-3">Producem pentru:</h4>
+                            <div class="dynamic-wrapper text-gold">
+                                <span id="dynamic-text"></span><span class="typewriter-cursor">|</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Secțiune Contact -->
+    <section id="contact" class="py-5 bg-white reveal">
+        <div class="container">
+            <div class="text-center mb-5 section-header">
+                <h2 class="fw-bold display-6">Contactează-ne</h2>
+                <p class="text-muted">Te așteptăm la atelierul nostru</p>
+            </div>
+            <div class="row text-center">
+                <div class="col-md-6 mb-4">
+                    <h5 class="fw-bold">Program</h5>
+                    <p class="text-muted">Luni - Vineri: 08:00 - 16:30<br>Sâmbătă - Duminică: Închis</p>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h5 class="fw-bold">Contact & Social</h5>
+                    <p class="text-muted mb-3">
+                        <a href="tel:+40766475700" class="text-decoration-none text-muted contact-link">+40 766 475 700</a><br>
+                        <a href="mailto:contact@romvogue.ro" class="text-decoration-none text-muted contact-link">contact@romvogue.ro</a>
+                    </p>
+                    <a href="https://www.facebook.com/romvogue.ro" target="_blank" class="btn btn-outline-primary btn-sm px-4 rounded-pill" aria-label="Vizitează pagina noastră de Facebook">
+                        Urmărește-ne pe Facebook
+                    </a>
+                    <div class="mt-4">
+                        <a href="./contact/" class="btn btn-gold px-4 rounded-pill shadow-sm">Completează Formularul</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h4 class="fw-bold text-gold mb-3">ROMVOGUE</h4>
+                    <p class="text-white-50 small">
+                        Redefinim standardele în industria textilă prin inovație, calitate și pasiune pentru detalii. Partenerul tău de încredere pentru producție și stil.
+                    </p>
+                </div>
+                <div class="col-lg-6 mb-4 text-lg-end">
+                    <h5 class="mb-3">Link-uri rapide</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Acasă</a></li>
+                        <li><a href="#servicii" class="text-white-50 text-decoration-none">Servicii</a></li>
+                        <li><a href="#despre" class="text-white-50 text-decoration-none">Despre Noi</a></li>
+                    </ul>
+                </div>
+                <!-- Secțiune Suport Clienți (Comentată pentru viitor)
+                <div class="col-lg-4 mb-4">
+                    <h5 class="mb-3">Suport Clienți</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white-50 text-decoration-none">Politica de Retur</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Termeni și Condiții</a></li>
+                        <li><a href="#" class="text-white-50 text-decoration-none">Politica de Confidențialitate</a></li>
+                    </ul>
+                </div>
+                -->
+            </div>
+            <hr class="border-secondary">
+            <div class="text-center text-white-50 small">
+                &copy; 2025 RomVogue. Toate drepturile rezervate.
+        </div>
+    </footer>
+
+    <!-- Buton Back to Top -->
+    <button id="back-to-top" title="Înapoi sus" aria-label="Înapoi la începutul paginii">
+        &uarr;
+    </button>
+
+    <!-- Bootstrap JS Bundle (necesar pentru meniul de mobil) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JS Personalizat -->
+    <script src="script.js"></script>
+</body>
+</html>

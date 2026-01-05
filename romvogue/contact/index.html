@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - RomVogue</title>
+    <meta name="description" content="Contactează echipa RomVogue pentru comenzi, întrebări sau colaborări.">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Fonturi Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS Personalizat -->
+    <link rel="stylesheet" href="contact-style.css">
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="text-center">
+            <h1 class="display-4 fw-bold text-white">ROMVOGUE</h1>
+            <p class="text-white-50 lead">Contact</p>
+        </div>
+    </div>
+
+    <!-- Navigație -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="../index.html">ROMVOGUE</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Acasă</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../index.html#servicii">Servicii</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="../catalog/">Catalog</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../index.html#despre">Despre Noi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="../contact/">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Pagină -->
+    <header class="hero-slide d-flex align-items-center justify-content-center text-center text-white" style="height: 50vh; min-height: 400px;">
+        <div class="hero-bg-animated" style="background-image: url('../imagini/1.jpg');"></div>
+        <div class="hero-overlay d-flex align-items-center justify-content-center">
+            <div class="container">
+                <h1 class="display-3 fw-bold mb-3">Contactează-ne</h1>
+                <p class="lead">Suntem aici pentru a răspunde întrebărilor tale.</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Secțiune Formular -->
+    <section class="py-5 reveal">
+        <div class="container my-5">
+            <div class="row g-5">
+                <!-- Informații Contact -->
+                <div class="col-lg-5">
+                    <div class="p-4 bg-white shadow-sm rounded h-100 border-0">
+                        <h3 class="fw-bold mb-4">Informații</h3>
+                        <p class="text-muted mb-4">Ai o idee de proiect sau vrei să afli mai multe despre serviciile noastre? Scrie-ne sau sună-ne!</p>
+                        
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-gold">Telefon</h5>
+                            <a href="tel:+40766475700" class="text-decoration-none text-dark contact-link">+40 766 475 700</a>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-gold">Email</h5>
+                            <a href="mailto:contact@romvogue.ro" class="text-decoration-none text-dark contact-link">contact@romvogue.ro</a>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5 class="fw-bold text-gold">Program</h5>
+                            <p class="text-muted mb-0">Luni - Vineri: 08:00 - 16:30</p>
+                            <p class="text-muted">Sâmbătă - Duminică: Închis</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formular -->
+                <div class="col-lg-7">
+                    <div class="p-4 bg-white shadow-sm rounded border-0">
+                        <h3 class="fw-bold mb-4">Trimite un mesaj</h3>
+                        <form id="contact-form">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="nume" class="form-label">Nume</label>
+                                    <input type="text" class="form-control" id="nume" name="nume" placeholder="Numele tău" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="adresa@email.com" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="subiect" class="form-label">Subiect</label>
+                                    <input type="text" class="form-control" id="subiect" name="subiect" placeholder="Despre ce dorești să discutăm?">
+                                </div>
+                                <div class="col-12">
+                                    <label for="mesaj" class="form-label">Mesaj</label>
+                                    <textarea class="form-control" id="mesaj" name="mesaj" rows="5" placeholder="Detaliază proiectul tău..." required></textarea>
+                                </div>
+                                <div class="col-12 mt-4">
+                                    <button type="submit" id="submit-btn" class="btn btn-gold btn-lg w-100">Trimite Mesajul</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <h4 class="fw-bold text-gold mb-3">ROMVOGUE</h4>
+                    <p class="text-white-50 small">
+                        Redefinim standardele în industria textilă prin inovație, calitate și pasiune pentru detalii. Partenerul tău de încredere pentru producție și stil.
+                    </p>
+                </div>
+                <div class="col-lg-6 mb-4 text-lg-end">
+                    <h5 class="mb-3">Link-uri rapide</h5>
+                    <ul class="list-unstyled">
+                    <li><a href="../index.html" class="text-white-50 text-decoration-none">Acasă</a></li>
+                    <li><a href="../index.html#servicii" class="text-white-50 text-decoration-none">Servicii</a></li>
+                    <li><a href="../index.html#despre" class="text-white-50 text-decoration-none">Despre Noi</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <div class="text-center text-white-50 small">
+                &copy; 2025 RomVogue. Toate drepturile rezervate.
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="contact-script.js"></script>
+</body>
+</html>

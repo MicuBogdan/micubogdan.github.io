@@ -1,0 +1,635 @@
+/* Setări Generale */
+:root {
+    --rom-blue: #2c3e50; /* Midnight Blue - Mai prietenos, modern și elegant */
+    --rom-gold: #b08d55; /* Bronze/Leather - Culoare de piele naturală/bronz, mai "craft" */
+    --rom-gold-hover: #8c6b3d;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f1ea; /* Linen - Culoare de pânză de in, foarte tematică */
+    color: var(--rom-blue);
+    padding-top: 0; /* Navbar-ul este acum transparent peste hero */
+    overflow-x: hidden; /* Previne scroll-ul orizontal nedorit de la elementele decorative */
+    position: relative;
+    line-height: 1.6; /* Spațiere mai bună între rânduri pentru lizibilitate */
+    
+    /* Textură Material Textil (Weave Pattern) */
+    background-image: 
+        repeating-linear-gradient(45deg, rgba(44, 62, 80, 0.03) 0px, rgba(44, 62, 80, 0.03) 1px, transparent 1px, transparent 6px),
+        repeating-linear-gradient(-45deg, rgba(44, 62, 80, 0.03) 0px, rgba(44, 62, 80, 0.03) 1px, transparent 1px, transparent 6px);
+    background-size: 10px 10px;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f4f1ea;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--rom-gold);
+    border-radius: 6px;
+    border: 3px solid #f4f1ea;
+}
+
+/* Tipografie Premium */
+h1, h2, h3, h4, h5, h6, .navbar-brand, .display-4, .display-6 {
+    font-family: 'Playfair Display', serif;
+    font-style: normal; /* Renunțăm la italic pentru un aspect mai "serios" și artizanal */
+    letter-spacing: -0.5px; /* Aspect mai compact și elegant */
+}
+
+.ls-2 {
+    letter-spacing: 2px;
+}
+
+/* Responsive Typography - Previne titlurile gigantice pe mobil */
+@media (max-width: 768px) {
+    .display-4 { font-size: 2.5rem; }
+    .display-6 { font-size: 1.8rem; }
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+}
+
+/* Navbar */
+.navbar {
+    transition: all 0.4s ease;
+    padding: 20px 0; /* Spațiere mai mare inițial */
+}
+
+.navbar.scrolled {
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    padding: 10px 0; /* Se micșorează la scroll */
+}
+
+.navbar-brand {
+    color: #ffffff !important; /* Alb pe hero */
+    letter-spacing: 1px;
+    font-size: 1.5rem;
+    transition: color 0.3s ease;
+}
+
+.navbar.scrolled .navbar-brand {
+    color: var(--rom-blue) !important; /* Culoare normală la scroll */
+}
+
+.nav-link {
+    font-weight: 500;
+    margin-right: 15px;
+    color: rgba(255, 255, 255, 0.9) !important; /* Alb pe hero */
+    transition: color 0.3s ease;
+}
+
+.navbar.scrolled .nav-link {
+    color: var(--rom-blue) !important; /* Culoare normală la scroll */
+}
+
+/* Navbar Toggler (Hamburger Menu) */
+.navbar-toggler {
+    border-color: rgba(255,255,255,0.5);
+}
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.navbar.scrolled .navbar-toggler {
+    border-color: rgba(0,0,0,0.1);
+}
+.navbar.scrolled .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(44, 62, 80, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+/* Mobile Menu Fix */
+@media (max-width: 991px) {
+    .navbar-collapse {
+        background: #ffffff;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .navbar-collapse .nav-link {
+        color: var(--rom-blue) !important;
+    }
+}
+
+/* Hero Section */
+.hero-slide {
+    height: 85vh; /* Mai înalt pentru a ascunde serviciile la încărcare */
+    min-height: 550px; /* Asigură spațiu suficient pentru text în landscape/mobil */
+    position: relative;
+    overflow: hidden; /* Esențial pentru ca imaginea mărită să nu iasă din cadru */
+}
+
+/* Container pentru imaginea de fundal animată */
+.hero-bg-animated {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    transform: scale(1);
+}
+
+/* Animația pornește imediat ce slide-ul devine vizibil (inclusiv în tranziție) */
+.carousel-item .hero-bg-animated {
+    animation: zoomOutEffect 12s ease forwards;
+}
+
+.hero-overlay {
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.85), rgba(44, 62, 80, 0.6)); /* Gradient mai dinamic și mai puțin opac */
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 1; /* Asigurăm că textul stă peste imaginea animată */
+}
+
+/* Text Shadow pentru lizibilitate maximă în Hero */
+.hero-overlay h1,
+.hero-overlay p,
+.hero-overlay span {
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.9);
+}
+
+/* Keyframes pentru efectul Ken Burns (Zoom Out) */
+@keyframes zoomOutEffect {
+    0% { transform: scale(1.15); } /* Începe ușor mărit (15%) */
+    100% { transform: scale(1); } /* Revine la normal */
+}
+
+/* Carousel Customization */
+.carousel-control-prev, .carousel-control-next {
+    width: 5%; /* Împinge săgețile mult mai spre margini (standard e 15%) */
+}
+
+/* Ajustări Săgeți pe Mobil */
+@media (max-width: 768px) {
+    .carousel-control-prev-icon, .carousel-control-next-icon {
+        width: 1.5rem; /* Iconițe mai mici și discrete */
+        height: 1.5rem;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); /* Umbră pentru vizibilitate */
+    }
+}
+
+/* SVG Wave Divider */
+.custom-shape-divider-bottom-1680000000 {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+    z-index: 10; /* Asigură că valul este peste imagine și conținut */
+    pointer-events: none;
+}
+
+.custom-shape-divider-bottom-1680000000 svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px); /* Lățime standard pentru a evita distorsiunea */
+    height: 150px; /* Înălțime mai mare pentru o curbă mai pronunțată */
+    filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1)); /* Umbră subtilă pentru profunzime */
+}
+
+@media (max-width: 768px) {
+    .custom-shape-divider-bottom-1680000000 svg {
+        height: 100px; /* Mai vizibil pe mobil */
+    }
+}
+
+.custom-shape-divider-bottom-1680000000 .shape-fill {
+    fill: #F4F1EA;
+}
+
+/* Servicii Section Spacing */
+#servicii {
+    margin-top: 10vh; /* Spațiu optimizat pentru a apărea rapid la scroll */
+    margin-bottom: 5rem;
+}
+
+/* Carduri Servicii - Stil "Mostră de Material" cu efect Flip Book */
+.service-card {
+    background: #ffffff;
+    border: none;
+    border-radius: 2px;
+    overflow: visible;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    transition: transform 0.3s ease;
+    height: 100%;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    perspective: 1000px; /* Esențial pentru efectul 3D de carte */
+}
+
+.service-bg {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    background-size: cover;
+    background-position: center;
+    margin-bottom: 20px;
+    /* Stil Ramă */
+    border: 6px solid #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    outline: 1px dashed var(--rom-gold);
+    outline-offset: 4px;
+    
+    /* Configurare Animație Flip Book */
+    transform-origin: left center; /* Se deschide ca o carte (stânga) */
+    transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    filter: grayscale(30%);
+}
+
+/* Efect Panoramic (Concav) pentru Imaginile din Servicii (Desktop) */
+@media (min-width: 992px) {
+    /* Resetăm efectul de "Book Open" pentru a aplica Panoramic */
+    .service-bg {
+        transform-origin: center center !important; /* Rotire de la centru, nu stânga */
+        transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.5s ease;
+    }
+
+    /* Asigurăm perspectiva pe card */
+    .service-card {
+        perspective: 1500px;
+        overflow: visible; /* Permitem imaginii să iasă din card la zoom */
+    }
+
+    /* Card 1 (Stânga Extremă) - Imaginea se rotește spre dreapta */
+    .mobile-scroll-item:nth-child(1) .service-bg {
+        transform: rotateY(15deg) scale(0.95);
+    }
+
+    /* Card 2 (Stânga Centru) - Imaginea se rotește puțin, vine spre user */
+    .mobile-scroll-item:nth-child(2) .service-bg {
+        transform: rotateY(5deg) scale(0.9) translateZ(10px);
+        z-index: 5;
+    }
+
+    /* Card 3 (Dreapta Centru) - Imaginea se rotește puțin, vine spre user */
+    .mobile-scroll-item:nth-child(3) .service-bg {
+        transform: rotateY(-5deg) scale(0.9) translateZ(10px);
+        z-index: 5;
+    }
+
+    /* Card 4 (Dreapta Extremă) - Imaginea se rotește spre stânga */
+    .mobile-scroll-item:nth-child(4) .service-bg {
+        transform: rotateY(-15deg) scale(0.95);
+    }
+
+    /* La Hover: Imaginea se îndreaptă (0 grade), vine în față și face zoom */
+    .service-card:hover .service-bg {
+        transform: rotateY(0deg) scale(1.1) translateZ(30px) !important;
+        z-index: 100;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+}
+
+.service-card:hover .service-bg {
+    transform: rotateY(-15deg) translateX(5px); /* Se deschide ușor */
+    box-shadow: -5px 5px 15px rgba(0,0,0,0.15); /* Umbra se mută pentru realism */
+    filter: grayscale(0%);
+    outline-color: var(--rom-blue);
+}
+
+.card-body {
+    padding: 0;
+    text-align: center;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.service-card:hover .btn-link {
+    color: var(--rom-gold) !important;
+}
+
+/* Butoane Premium */
+.btn-dark {
+    background-color: var(--rom-blue);
+    border: none;
+    padding: 10px;
+}
+
+.btn-dark:hover {
+    background-color: #0a111f;
+}
+
+.btn-gold {
+    background-color: var(--rom-gold);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    border-radius: 0; /* Butoane drepte, mai serioase */
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.btn-gold:hover {
+    background-color: var(--rom-gold-hover);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Buton Back to Top */
+#back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: var(--rom-gold);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: none; /* Ascuns implicit */
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 9999;
+    transition: all 0.3s ease;
+}
+
+#back-to-top:hover {
+    background-color: var(--rom-gold-hover);
+    transform: translateY(-5px);
+}
+
+/* Footer Override */
+.bg-dark {
+    background-color: var(--rom-blue) !important;
+}
+
+/* Preloader */
+#preloader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--rom-blue);
+    z-index: 99999; /* Peste tot restul site-ului */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+#preloader h1 {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.98); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.preloader-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* Animații Scroll (Reveal) */
+.reveal {
+    opacity: 0;
+    transform: translateY(50px); /* Elementul e mai jos inițial */
+    transition: all 1s ease-out;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0); /* Revine la poziția normală */
+}
+
+/* Elemente Decorative Titluri (Non-linear look) */
+.section-header {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.section-header h2::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background-color: var(--rom-gold);
+    margin: 15px auto 0;
+    border-radius: 2px;
+}
+
+/* Despre Noi - Dynamic Text */
+.dynamic-badge {
+    background-color: var(--rom-gold);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 1.2rem;
+    display: inline-block;
+    min-width: 240px; /* Lățime fixă pentru a nu sări textul */
+    text-align: center;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+@media (max-width: 768px) {
+    .dynamic-badge {
+        background-color: transparent;
+        color: var(--rom-gold);
+        padding: 0;
+        box-shadow: none;
+        min-width: auto;
+    }
+}
+
+.text-hidden {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* Elemente Decorative Ambientale (Blobs) */
+.decorative-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1; /* În spatele conținutului */
+    opacity: 0.4;
+    animation: float 10s infinite ease-in-out;
+}
+
+.blob-1 {
+    top: -10%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background-color: rgba(176, 141, 85, 0.1); /* Bronz pal */
+}
+
+.blob-2 {
+    bottom: -10%;
+    left: -10%;
+    width: 600px;
+    height: 600px;
+    background-color: rgba(44, 62, 80, 0.08); /* Albastru ardezie foarte pal */
+    animation-delay: 5s;
+}
+
+@keyframes float {
+    0% { transform: translate(0, 0); }
+    50% { transform: translate(20px, 30px); }
+    100% { transform: translate(0, 0); }
+}
+
+/* Mobile Design Redesign - Clean & Vertical */
+@media (max-width: 768px) {
+    /* 1. Servicii: Listă Verticală (Fără Scroll Orizontal) */
+    .mobile-scroll-container {
+        display: flex;
+        flex-direction: column; /* Asigurăm ordinea verticală */
+        overflow-x: visible;
+        padding-bottom: 0; /* Eliminăm spațiul extra de jos */
+    }
+
+    .mobile-scroll-item {
+        position: sticky;
+        top: 100px; /* Distanța față de meniul de sus */
+        z-index: 1;
+        margin-bottom: 50px; /* Spațiu mai generos între carduri pentru efectul de scroll */
+        /* Efect de umbră inversă pentru a separa cardurile vizual când se suprapun */
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.05); 
+        background-color: #f4f1ea; /* Culoarea fundalului pentru a masca elementele de sub (dacă e cazul) */
+        padding-top: 10px; /* Mic spațiu de respirație */
+    }
+
+    /* Asigurăm ordinea Z pentru suprapunere corectă, fără decalaj */
+    .mobile-scroll-item:nth-child(1) { z-index: 1; }
+    .mobile-scroll-item:nth-child(2) { z-index: 2; }
+    .mobile-scroll-item:nth-child(3) { z-index: 3; }
+    .mobile-scroll-item:nth-child(4) { z-index: 4; }
+
+    /* Eliminăm marginea de la ultimul element pentru a nu lăsa spațiu gol la final */
+    .mobile-scroll-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    /* 2. Hero: Text Centrat Obligatoriu */
+    .hero-overlay {
+        justify-content: center !important;
+        text-align: center !important;
+    }
+    
+    .hero-overlay .container {
+        align-items: center !important;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 3. Ajustări Spațiere */
+    #servicii {
+        margin-top: 5vh; /* Aducem conținutul mai aproape de banner pe mobil */
+        margin-bottom: 2rem; /* Reducem spațiul de după secțiune pe mobil */
+    }
+}
+
+/* Imagine Despre Noi - Stil Moodboard */
+.moodboard-image {
+    position: relative;
+    z-index: 1;
+    border: 10px solid #fff;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+
+.moodboard-wrapper {
+    position: relative;
+    padding: 20px;
+}
+
+/* De Ce Noi Section */
+.text-gold {
+    color: var(--rom-gold) !important;
+}
+
+.reason-card {
+    background: #ffffff;
+    transition: all 0.3s ease; 
+    border: 1px solid rgba(0,0,0,0.05);
+    border-left: 4px solid var(--rom-gold); /* Accent simplu în stânga */
+    box-shadow: none;
+    border-radius: 2px !important;
+}
+
+.reason-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    border-left-color: var(--rom-blue);
+}
+
+/* Hover effect pentru textul din reason card */
+/* Eliminăm schimbarea culorii textului pentru un aspect mai curat */
+
+/* Typewriter Fix & Cursor */
+.dynamic-wrapper {
+    display: block;
+    min-height: 1.6em; /* Rezervă spațiu pentru 1 rând */
+    line-height: 1.4;
+    white-space: nowrap; /* Forțează textul pe un singur rând */
+}
+
+@media (max-width: 576px) {
+    .dynamic-wrapper {
+        font-size: 0.7em; /* Micșorăm fontul pe mobil ca să încapă pe un rând */
+    }
+}
+
+.typewriter-cursor {
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    font-weight: 100;
+    margin-left: 2px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Fix specific pentru textul dinamic din Despre Noi */
+#despre .dynamic-wrapper {
+    display: inline-block;
+    font-size: 1.5rem; /* Mărime h4 pentru a fi la fel cu "Producem pentru" */
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    min-height: auto; /* Eliminăm spațiul extra vertical */
+    line-height: 1.2;
+}
+
+/* Contact Links Hover */
+.contact-link:hover {
+    text-decoration: underline !important;
+    color: var(--rom-blue) !important;
+}
+
+/* Fix pentru navigarea prin ancore (previne acoperirea de către navbar-ul fix) */
+#despre, 
+#servicii,
+#contact {
+    scroll-margin-top: 100px; /* Această valoare compensează înălțimea navbar-ului tău */
+}
+
+/* Opțional: Adaugă scroll fluid pentru o tranziție mai elegantă */
+html {
+    scroll-behavior: smooth;
+}
