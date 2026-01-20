@@ -88,6 +88,30 @@ const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
 const flipBtn = document.getElementById('flip');
 const shuffleBtn = document.getElementById('shuffle');
+const themeToggle = document.getElementById('themeToggle');
+
+function applyTheme(t){
+  if(t==='dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    themeToggle.textContent = '☀️ Light';
+    themeToggle.setAttribute('aria-pressed','true');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    themeToggle.textContent = '🌙 Dark';
+    themeToggle.setAttribute('aria-pressed','false');
+  }
+  try{ localStorage.setItem('flashcards-theme', t); }catch(e){}
+}
+
+// init theme from localStorage or prefers-color-scheme
+const savedTheme = (()=>{ try{return localStorage.getItem('flashcards-theme')}catch(e){return null}})();
+if(savedTheme) applyTheme(savedTheme);
+else if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
+
+if(themeToggle) themeToggle.addEventListener('click',()=>{
+  const cur = document.documentElement.getAttribute('data-theme')==='dark' ? 'dark' : 'light';
+  applyTheme(cur==='dark' ? 'light' : 'dark');
+});
 
 function uniqueGroups(){
   const g = Array.from(new Set(cards.map(c=>c.group))).sort((a,b)=>a-b);
@@ -144,3 +168,4 @@ function shuffle(a){
 }
 
 uniqueGroups(); render();
+
