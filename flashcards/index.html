@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flashcarduri — Istoria Evreilor în România</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="top">
+    <h1>Flashcarduri: Istoria Evreilor în România</h1>
+    <p class="subtitle">Fiecare card afișează grupul de întrebări (ex: Grup 1, 2, 3...)</p>
+  </header>
+
+  <main class="container">
+    <section class="controls">
+      <label>Filtrează grup:
+        <select id="groupFilter">
+          <option value="all">Toate grupurile</option>
+        </select>
+      </label>
+      <label>Căutare:
+        <input id="search" placeholder="Cuvânt cheie..." />
+      </label>
+      <div class="buttons">
+        <button id="prev">◀ Anterior</button>
+        <button id="flip">Răstoarnă</button>
+        <button id="next">Următor ▶</button>
+        <button id="shuffle">Amestecă</button>
+      </div>
+    </section>
+
+    <section id="cardArea" class="card-area">
+      <!-- Card generat din JS -->
+    </section>
+
+    <footer class="footnote">Deschide acest fișier în browser pe telefon sau desktop. Responsive și accesibil.</footer>
+  </main>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
