@@ -84,6 +84,16 @@ let mapMarkers = [];
 let reliefMode = true;
 let currentLocation = null;
 let isRandomMode = false;
+let selectedReliefType = 'toate';
+let selectedZone = 'toate';
+
+// Zone definitions (longitude ranges approximately)
+const zones = {
+    'europa': { minLat: 35, maxLat: 72, minLng: -10, maxLng: 70 },
+    'asia': { minLat: -10, maxLat: 80, minLng: 60, maxLng: 180 },
+    'america': { minLat: -60, maxLat: 75, minLng: -170, maxLng: -30 },
+    'africa': { minLat: -35, maxLat: 40, minLng: -20, maxLng: 55 }
+};
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -97,6 +107,71 @@ function loadLocations() {
     const saved = localStorage.getItem('customLocations');
     const custom = saved ? JSON.parse(saved) : [];
     allLocations = [...defaultLocations, ...custom];
+    updateFilteredCount();
+}
+
+// Select relief type
+function selectReliefType(type) {
+    selectedReliefType = type;
+    
+    // Update button states
+    document.querySelectorAll('.filter-btn[data-type]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`.filter-btn[data-type="${type}"]`).classList.add('active');
+    
+    updateFilteredCount();
+}
+
+// Select geographical zone
+function selectZone(zone) {
+    selectedZone = zone;
+    
+    // Update button states
+    document.querySelectorAll('.filter-btn[data-zone]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`.filter-btn[data-zone="${zone}"]`).classList.add('active');
+    
+    updateFilteredCount();
+}
+
+// Get filtered locations based on selections
+function getFilteredLocations() {
+    let filtered = allLocations;
+    
+    // Filter by relief type
+    if (selectedReliefType !== 'toate') {
+        filtered = filtered.filter(loc => loc.type === selectedReliefType);
+    }
+    
+    // Filter by zone
+    if (selectedZone !== 'toate') {
+        const zone = zones[selectedZone];
+        filtered = filtered.filter(loc => {
+            const [lat, lng] = loc.coords;
+            return lat >= zone.minLat && lat <= zone.maxLat && 
+                   lng >= zone.minLng && lng <= zone.maxLng;
+        });
+    }
+    
+    return filtered;
+}
+
+// Update filtered count display
+function updateFilteredCount() {
+    const filtered = getFilteredLocations();
+    const countEl = document.getElementById('selected-count');
+    if (countEl) {
+        countEl.textContent = `Locații disponibile: ${filtered.length}`;
+        
+        if (filtered.length === 0) {
+            countEl.style.color = '#ffcccc';
+            countEl.textContent = '⚠️ Nicio locație găsită cu filtrele selectate!';
+        } else {
+            countEl.style.color = 'white';
+        }
+    }
 }
 
 // Initialize map
@@ -128,7 +203,7 @@ function initMap() {
 }
 
 // Initialize quiz map
-function initQuizMap() {
+function initQuizMap(callback) {
     if (mapQuiz) {
         mapQuiz.off();
         mapQuiz.remove();
@@ -147,14 +222,13 @@ function initQuizMap() {
 
         reliefLayer.addTo(mapQuiz);
         mapQuiz.reliefLayer = reliefLayer;
-
-        mapQuiz.on('click', (e) => {
-            if (quizActive) {
-                checkAnswer(e.latlng);
-            }
-        });
         
         mapQuiz.invalidateSize();
+        
+        // Call callback after map is ready
+        if (callback) {
+            setTimeout(callback, 100);
+        }
     }, 50);
 }
 
@@ -184,7 +258,14 @@ function switchTab(event, tabName) {
 
 // Start quiz
 function startQuiz() {
-    quizLocations = [...allLocations].sort(() => Math.random() - 0.5);
+    const filtered = getFilteredLocations();
+    
+    if (filtered.length === 0) {
+        alert('⚠️ Nicio locație disponibilă cu filtrele selectate! Alege alte opțiuni.');
+        return;
+    }
+    
+    quizLocations = [...filtered].sort(() => Math.random() - 0.5);
     currentQuestionIndex = 0;
     correctAnswers = 0;
     totalQuestions = quizLocations.length;
@@ -197,15 +278,23 @@ function startQuiz() {
     document.getElementById('start-btn').style.display = 'none';
     document.getElementById('random-btn').style.display = 'none';
     
-    initQuizMap();
-    nextQuestion();
+    initQuizMap(() => {
+        nextQuestion();
+    });
 }
 
 // Get random location (not quiz)
 function getRandomLocation() {
+    const filtered = getFilteredLocations();
+    
+    if (filtered.length === 0) {
+        alert('⚠️ Nicio locație disponibilă cu filtrele selectate! Alege alte opțiuni.');
+        return;
+    }
+    
     isRandomMode = true;
     quizActive = true;
-    currentLocation = allLocations[Math.floor(Math.random() * allLocations.length)];
+    currentLocation = filtered[Math.floor(Math.random() * filtered.length)];
     
     document.getElementById('start-message').style.display = 'none';
     document.getElementById('quiz-main').style.display = 'block';
@@ -214,8 +303,9 @@ function getRandomLocation() {
     document.getElementById('random-btn').style.display = 'none';
     document.getElementById('current-question').textContent = 'Mod liber';
     
-    initQuizMap();
-    displayRandomLocation();
+    initQuizMap(() => {
+        displayRandomLocation();
+    });
 }
 
 // Next question
@@ -238,8 +328,12 @@ function nextQuestion() {
         
         document.getElementById('feedback').classList.remove('show', 'success', 'error');
         
-        clearQuizMapMarkers();
-        mapQuiz.setView([20, 0], 2);
+        if (mapQuiz) {
+            clearQuizMapMarkers();
+            mapQuiz.setView([20, 0], 2);
+            // Display all location markers
+            displayAllMarkers();
+        }
     } else {
         endQuiz();
     }
@@ -260,88 +354,118 @@ function displayRandomLocation() {
     
     document.getElementById('feedback').classList.remove('show', 'success', 'error');
     
-    clearQuizMapMarkers();
-    mapQuiz.setView([20, 0], 2);
+    if (mapQuiz) {
+        clearQuizMapMarkers();
+        mapQuiz.setView([20, 0], 2);
+        // Display all location markers
+        displayAllMarkers();
+    }
+}
+
+// Display all markers on quiz map
+function displayAllMarkers() {
+    const filtered = getFilteredLocations();
+    
+    filtered.forEach(location => {
+        // In quiz mode, all markers are neutral color (blue/purple)
+        const color = '#667eea';
+        const marker = L.circleMarker(location.coords, {
+            radius: 12,
+            fillColor: color,
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.85,
+            bubblingMouseEvents: false
+        }).addTo(mapQuiz);
+        
+        marker.locationData = location;
+        
+        marker.on('click', function(e) {
+            L.DomEvent.stopPropagation(e);
+            if (quizActive) {
+                checkMarkerAnswer(this, location);
+            }
+        });
+        
+        marker.on('mouseover', function() {
+            if (quizActive) {
+                this.setStyle({
+                    fillOpacity: 1,
+                    weight: 3
+                });
+            }
+        });
+        
+        marker.on('mouseout', function() {
+            if (quizActive && this.options.fillColor === color) {
+                this.setStyle({
+                    fillOpacity: 0.85,
+                    weight: 2
+                });
+            }
+        });
+    });
 }
 
 // Check answer
 function checkAnswer(clickedLatLng) {
+    // This function is no longer used - keeping for compatibility
+    return;
+}
+
+// Check marker answer
+function checkMarkerAnswer(marker, location) {
     if (!quizActive || !currentLocation) return;
-
-    const [correctLat, correctLng] = currentLocation.coords;
     
-    const distance = Math.sqrt(
-        Math.pow(clickedLatLng.lat - correctLat, 2) + 
-        Math.pow(clickedLatLng.lng - correctLng, 2)
-    );
-
-    // Tolerance: within ~4 degrees (more lenient)
-    const tolerance = 4;
-    
-    if (distance < tolerance) {
+    if (location.name === currentLocation.name) {
+        // Correct answer!
         correctAnswers++;
         document.getElementById('score').querySelector('.score-value').textContent = 
             `${correctAnswers}/${totalQuestions}`;
         
-        // Add correct marker at clicked location
-        L.circleMarker(clickedLatLng, {
-            radius: 12,
+        // Change clicked marker to green
+        marker.setStyle({
             fillColor: '#28a745',
-            color: '#fff',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9
-        }).addTo(mapQuiz).bindPopup(`✓ Corect: ${currentLocation.name}`).openPopup();
-
-        // Add target marker at exact location
-        L.circleMarker([correctLat, correctLng], {
-            radius: 8,
-            fillColor: '#1fa92f',
-            color: '#fff',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.7
-        }).addTo(mapQuiz);
+            fillOpacity: 1,
+            radius: 14,
+            weight: 3
+        });
+        
+        marker.bindPopup(`✓ Corect: ${currentLocation.name}`).openPopup();
         
         showFeedback('✓ Răspuns corect! 🎉', 'success');
         quizActive = false;
         document.getElementById('next-location-btn').classList.remove('hidden');
         
     } else {
-        // Wrong answer - show marker at wrong location
-        L.circleMarker(clickedLatLng, {
-            radius: 12,
+        // Wrong answer!
+        // Change clicked marker to red
+        marker.setStyle({
             fillColor: '#dc3545',
-            color: '#fff',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9
-        }).addTo(mapQuiz).bindPopup(`✗ Prea departe!`).openPopup();
-
-        // Show acceptance radius (zone corectă)
-        L.circle([correctLat, correctLng], {
-            radius: tolerance * 111000, // Convert degrees to meters (approximately)
-            color: '#ffc107',
-            weight: 2,
-            opacity: 0.5,
-            fill: true,
-            fillColor: '#ffc107',
-            fillOpacity: 0.1,
-            dashArray: '5, 5'
-        }).addTo(mapQuiz).bindPopup('Zona acceptată');
-
-        // Show correct location
-        L.circleMarker([correctLat, correctLng], {
-            radius: 14,
-            fillColor: '#28a745',
-            color: '#fff',
-            weight: 3,
-            opacity: 1,
-            fillOpacity: 0.9
-        }).addTo(mapQuiz).bindPopup(`📍 Locația corectă: ${currentLocation.name}`).openPopup();
+            fillOpacity: 1,
+            radius: 12,
+            weight: 3
+        });
         
-        const distanceKm = (distance * 111).toFixed(0); // Approximate conversion
-        showFeedback(`✗ Prea departe! (~${distanceKm}km de țintă) Încearcă din nou!`, 'error');
+        marker.bindPopup(`✗ Greșit: ${location.name}`).openPopup();
+        
+        // Find and highlight the correct marker
+        mapQuiz.eachLayer(layer => {
+            if (layer instanceof L.CircleMarker && layer.locationData) {
+                if (layer.locationData.name === currentLocation.name) {
+                    layer.setStyle({
+                        fillColor: '#28a745',
+                        fillOpacity: 1,
+                        radius: 14,
+                        weight: 3
+                    });
+                    layer.bindPopup(`📍 Locația corectă: ${currentLocation.name}`).openPopup();
+                }
+            }
+        });
+        
+        showFeedback(`✗ Greșit! Locația corectă era: ${currentLocation.name}`, 'error');
     }
 }
 
@@ -357,12 +481,14 @@ function advanceToNext() {
     document.getElementById('next-location-btn').classList.add('hidden');
     
     if (isRandomMode) {
-        getRandomLocation();
+        currentLocation = getFilteredLocations()[Math.floor(Math.random() * getFilteredLocations().length)];
+        quizActive = true;
+        displayRandomLocation();
     } else {
         currentQuestionIndex++;
         if (currentQuestionIndex < quizLocations.length) {
-            nextQuestion();
             quizActive = true;
+            nextQuestion();
         } else {
             endQuiz();
         }
@@ -379,10 +505,14 @@ function endQuiz() {
     document.getElementById('start-btn').style.display = 'block';
     document.getElementById('random-btn').style.display = 'block';
     
+    const reliefTypeText = selectedReliefType === 'toate' ? 'toate tipurile' : typeEmojis[selectedReliefType] + ' ' + selectedReliefType;
+    const zoneText = selectedZone === 'toate' ? 'toate zonele' : selectedZone;
+    
     document.getElementById('start-message').innerHTML = `
         <h2>🎉 Quiz terminat!</h2>
         <p style="font-size: 20px; margin: 15px 0; font-weight: bold;">Scor final: ${correctAnswers}/${totalQuestions}</p>
         <p>${correctAnswers === totalQuestions ? '🏆 Perfect!' : correctAnswers >= totalQuestions * 0.7 ? '🎯 Bravo!' : '💪 Continuă antrenamentul!'}</p>
+        <p style="font-size: 13px; margin-top: 10px; opacity: 0.9;">Filtru: ${reliefTypeText} - ${zoneText}</p>
     `;
 }
 

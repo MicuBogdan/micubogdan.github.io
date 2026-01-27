@@ -50,8 +50,52 @@
                 <!-- Start Message -->
                 <div id="start-message" class="start-message">
                     <h2>Bun venit la Quiz de Geografie!</h2>
-                    <p>Vei primi o locație și trebuie s-o găsești pe hartă.</p>
-                    <p>Ai indicii cu coordonatele și descrierea locației.</p>
+                    <p>Alege tipul de relief și zona pentru a începe.</p>
+                    
+                    <!-- Filter Options -->
+                    <div class="filter-section">
+                        <h3>Tip Relief</h3>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-type="toate" onclick="selectReliefType('toate')">
+                                🌍 Toate
+                            </button>
+                            <button class="filter-btn" data-type="munte" onclick="selectReliefType('munte')">
+                                🏔️ Munți
+                            </button>
+                            <button class="filter-btn" data-type="vulcan" onclick="selectReliefType('vulcan')">
+                                🌋 Vulcani
+                            </button>
+                            <button class="filter-btn" data-type="podis" onclick="selectReliefType('podis')">
+                                🏜️ Podișuri
+                            </button>
+                            <button class="filter-btn" data-type="câmpie" onclick="selectReliefType('câmpie')">
+                                🌾 Câmpii
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3>Zonă Geografică</h3>
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-zone="toate" onclick="selectZone('toate')">
+                                🌍 Toate
+                            </button>
+                            <button class="filter-btn" data-zone="europa" onclick="selectZone('europa')">
+                                🇪🇺 Europa
+                            </button>
+                            <button class="filter-btn" data-zone="asia" onclick="selectZone('asia')">
+                                🌏 Asia
+                            </button>
+                            <button class="filter-btn" data-zone="america" onclick="selectZone('america')">
+                                🌎 America
+                            </button>
+                            <button class="filter-btn" data-zone="africa" onclick="selectZone('africa')">
+                                🌍 Africa
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="selected-count" id="selected-count">Locații disponibile: 53</div>
                 </div>
 
                 <!-- Buttons -->

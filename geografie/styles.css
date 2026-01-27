@@ -156,6 +156,60 @@ body {
     line-height: 1.5;
 }
 
+.filter-section {
+    margin: 20px 0;
+    text-align: left;
+}
+
+.filter-section h3 {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filter-btn {
+    padding: 10px 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.filter-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: white;
+    color: #667eea;
+    border-color: white;
+    box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.selected-count {
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
 .info-card {
     background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
     border-left: 5px solid #667eea;
@@ -399,6 +453,15 @@ body {
     height: 20px;
     border-radius: 4px;
     border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* Clickable markers */
+.clickable-marker {
+    cursor: pointer !important;
+}
+
+.leaflet-interactive {
+    cursor: pointer !important;
 }
 
 /* Form */
