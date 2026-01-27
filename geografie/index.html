@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geografie - Quiz Hartă</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🌍 Geografie Quiz</h1>
+                <div class="score" id="score">
+                    <span class="score-label">Scor:</span>
+                    <span class="score-value">0/0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'quiz')">
+                <i class="fas fa-book"></i> Quiz
+            </button>
+            <button class="tab-btn" onclick="switchTab(event, 'map')">
+                <i class="fas fa-map"></i> Hartă
+            </button>
+            <button class="tab-btn" onclick="switchTab(event, 'add')">
+                <i class="fas fa-plus"></i> Adaugă
+            </button>
+        </div>
+
+        <!-- Quiz Tab -->
+        <div id="quiz-tab" class="tab-content active">
+            <div class="quiz-container">
+                <!-- Info Card -->
+                <div class="info-card" id="info-card" style="display: none;">
+                    <div class="location-type" id="location-type"></div>
+                    <h2 id="location-name"></h2>
+                    <p id="location-desc"></p>
+                    <div class="coords-info">
+                        <span id="coords-text"></span>
+                    </div>
+                </div>
+
+                <!-- Start Message -->
+                <div id="start-message" class="start-message">
+                    <h2>Bun venit la Quiz de Geografie!</h2>
+                    <p>Vei primi o locație și trebuie s-o găsești pe hartă.</p>
+                    <p>Ai indicii cu coordonatele și descrierea locației.</p>
+                </div>
+
+                <!-- Buttons -->
+                <div class="button-group">
+                    <button class="btn-primary btn-lg" id="start-btn" onclick="startQuiz()">
+                        <i class="fas fa-play"></i> Începe Quiz
+                    </button>
+                    <button class="btn-secondary btn-lg" id="random-btn" onclick="getRandomLocation()">
+                        <i class="fas fa-random"></i> Locație Random
+                    </button>
+                </div>
+
+                <div class="stats">
+                    <span id="current-question">0/0</span>
+                    <button class="btn-small" onclick="resetQuiz()">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+
+                <!-- Main Quiz -->
+                <div id="quiz-main" style="display: none;">
+                    <div class="question" id="question">Găsește...</div>
+                    <div class="map-quiz" id="map-quiz"></div>
+                    <div class="feedback" id="feedback"></div>
+                    <button class="btn-primary btn-lg hidden" id="next-location-btn" onclick="advanceToNext()">
+                        <i class="fas fa-arrow-right"></i> Următoarea Locație
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Tab -->
+        <div id="map-tab" class="tab-content">
+            <div id="map"></div>
+            <div class="map-controls">
+                <button class="btn-small" onclick="clearMapMarkers()">
+                    <i class="fas fa-times"></i> Șterge Markeri
+                </button>
+                <button class="btn-small" onclick="showAllLocations()">
+                    <i class="fas fa-globe"></i> Arată Tot
+                </button>
+                <button class="btn-small" onclick="toggleReliefMap()">
+                    <i class="fas fa-mountain"></i> <span id="relief-btn-text">Relief ON</span>
+                </button>
+            </div>
+            <div class="legend">
+                <h4>Legenda Relief</h4>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #8B4513;"></span> Munți
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FFD700;"></span> Dealuri
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #90EE90;"></span> Câmpii
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #FF6347;"></span> Vulcani
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background: #4169E1;"></span> Apă
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Locations Tab -->
+        <div id="add-tab" class="tab-content">
+            <div class="form-container">
+                <h2><i class="fas fa-plus-circle"></i> Adaugă Locație Nouă</h2>
+                <form onsubmit="addLocation(event)">
+                    <input 
+                        type="text" 
+                        id="location-name" 
+                        placeholder="Numele locației" 
+                        required
+                    >
+                    <select id="location-type" required>
+                        <option value="">-- Selectează tipul --</option>
+                        <option value="munte">🏔️ Munte</option>
+                        <option value="vulcan">🌋 Vulcan</option>
+                        <option value="câmpie">🌾 Câmpie</option>
+                        <option value="podis">🏜️ Podis</option>
+                        <option value="deal">⛰️ Deal</option>
+                    </select>
+                    <textarea 
+                        id="location-desc" 
+                        placeholder="Descriere (opțional)"
+                        rows="3"
+                    ></textarea>
+                    <div class="coord-inputs">
+                        <input 
+                            type="number" 
+                            id="location-lat" 
+                            placeholder="Latitudine" 
+                            step="0.01"
+                            min="-90"
+                            max="90"
+                            required
+                        >
+                        <input 
+                            type="number" 
+                            id="location-lng" 
+                            placeholder="Longitudine" 
+                            step="0.01"
+                            min="-180"
+                            max="180"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Adaugă Locație
+                    </button>
+                </form>
+
+                <h2><i class="fas fa-list"></i> Locații Salvate Local</h2>
+                <div id="saved-locations" class="saved-list"></div>
+                <button class="btn-danger" onclick="clearLocalStorage()">
+                    <i class="fas fa-trash"></i> Șterge Toate Locațiile Locale
+                </button>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <a 
+                class="footer-btn" 
+                href="https://micubogdan.dev" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                aria-label="Made by Micu Vlad-Bogdan"
+            >
+                Made by Micu Vlad-Bogdan
+            </a>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
