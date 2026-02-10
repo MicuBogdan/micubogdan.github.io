@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <title>Tool Complet Economie - Producătorul</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eceff1; margin: 0; display: flex; }
+        nav { width: 250px; background: #2c3e50; color: white; height: 100vh; position: fixed; padding: 20px; }
+        main { margin-left: 290px; padding: 30px; width: 100%; }
+        .section { background: white; padding: 20px; border-radius: 10px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #2c3e50; border-bottom: 2px solid #3498db; }
+        .formula { background: #f8f9fa; border-left: 4px solid #e74c3c; padding: 10px; font-family: 'Courier New', monospace; margin: 10px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .calc-box { background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 10px; }
+        input { width: 70px; padding: 5px; margin: 5px; }
+        button { background: #3498db; color: white; border: none; padding: 8px; border-radius: 4px; cursor: pointer; }
+        .badge { background: #34495e; color: white; padding: 3px 8px; border-radius: 5px; font-size: 0.8em; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.9em; }
+        th { background: #3498db; color: white; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>Ghid Rapid</h2>
+    <p>1. <a href="#costuri" style="color:white">Costuri & Amortizare</a></p>
+    <p>2. <a href="#productivitate" style="color:white">Productivitate (W)</a></p>
+    <p>3. <a href="#profit" style="color:white">Profit & Rentabilitate</a></p>
+    <hr>
+    <p><small>Sursă: Materiale Prof. Laurențiu Ivanov</small></p>
+</nav>
+
+<main>
+    <h1>Economie: Comportamentul Producătorului</h1>
+
+    <div id="costuri" class="section">
+        <h2>1. Costurile de Producție (Lecția 2.5)</h2>
+        <p>Totalitatea cheltuielilor pentru producerea, depozitarea și vânzarea bunurilor.</p>
+        
+        <div class="grid">
+            <div>
+                <strong>Elemente de bază:</strong>
+                <div class="formula">CT = CF + CV</div>
+                <div class="formula">CTM = CT / Q | Cmg = ΔCT / ΔQ</div>
+                <p><strong>Amortizarea (A):</strong> Recuperarea treptată a valorii capitalului fix (Kj).</p>
+                <div class="formula">A = Valoarea K fix / Durata de utilizare</div>
+            </div>
+            <div class="calc-box">
+                <h4>Calculator Amortizare & Cost</h4>
+                Valoare Utilaj: <input type="number" id="v_k" placeholder="10000"> <br>
+                Ani utilizare: <input type="number" id="ani_k" placeholder="5">
+                <button onclick="calcAmort()">Calculează</button>
+                <div id="resAmort" style="font-weight:bold; margin-top:5px; color:#2c3e50;"></div>
+            </div>
+        </div>
+
+        <h3>Căi de reducere a costurilor (Din PPT):</h3>
+        <ul>
+            <li>Negocierea prețurilor de cumpărare a factorilor mai mici.</li>
+            <li>Reducerea stocurilor și a consumului de materiale.</li>
+            <li>Scăderea cheltuielilor administrative și de exploatare.</li>
+        </ul>
+    </div>
+
+    <div id="productivitate" class="section">
+        <h2>2. Productivitatea (Lecția 2.6)</h2>
+        <div class="grid">
+            <div>
+                <strong>Tipuri de Productivitate:</strong>
+                <ul>
+                    <li><strong>Muncă (L):</strong> WML = Q/L | WmgL = ΔQ/ΔL</li>
+                    <li><strong>Pământ (P):</strong> WMP = Q/P | WmgP = ΔQ/ΔP</li>
+                    <li><strong>Capital (K):</strong> WMK = Q/K | WmgK = ΔQ/ΔK</li>
+                </ul>
+                <div class="formula">
+                    <strong>Maximizarea Profitului:</strong><br>
+                    WmgX / Px = WmgY / Py
+                </div>
+            </div>
+            <div class="calc-box">
+                <h4>Verifică Productivitatea Marginală</h4>
+                Q0: <input type="number" id="q0" placeholder="100"> Q1: <input type="number" id="q1" placeholder="150"><br>
+                L0: <input type="number" id="l0" placeholder="2"> L1: <input type="number" id="l1" placeholder="3">
+                <button onclick="calcWmg()">Calculează Wmg</button>
+                <div id="resWmg" style="font-weight:bold; margin-top:5px; color:#2c3e50;"></div>
+            </div>
+        </div>
+        <p><strong>Efecte creștere W:</strong> Scad costurile unitare, cresc profiturile, crește competitivitatea, crește nivelul de trai.</p>
+    </div>
+
+    <div id="profit" class="section">
+        <h2>3. Profitul (Lecția 2.7)</h2>
+        <div class="grid">
+            <div>
+                <strong>Formule cheie:</strong>
+                <div class="formula">Pr Brut = IT - CT = (P - CTM) * Q</div>
+                <div class="formula">Pr Net = Pr Brut - Impozit</div>
+                <div class="formula">Rata Pr (la cost) = (Pr / CT) * 100</div>
+                <p><strong>Pragul de rentabilitate:</strong> Q unde IT = CT (Pr = 0).</p>
+            </div>
+            <div>
+                <strong>Producția Optimă:</strong> Inregistrată când diferența dintre Preț (P) și Cost Mediu (CTM) este maximă.
+                <div class="calc-box">
+                    <h4>Calculator Prag Rentabilitate (Estimat)</h4>
+                    Preț Vânzare: <input type="number" id="p_v" placeholder="50"><br>
+                    Cost Fix: <input type="number" id="cf_r" placeholder="1000"><br>
+                    Cost Var/unit: <input type="number" id="cv_u" placeholder="30">
+                    <button onclick="calcPrag()">Calculează Prag Q</button>
+                    <div id="resPrag" style="font-weight:bold; margin-top:5px; color:#c0392b;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    function calcAmort() {
+        let v = document.getElementById('v_k').value;
+        let t = document.getElementById('ani_k').value;
+        if(v && t) {
+            let a = v / t;
+            document.getElementById('resAmort').innerText = "Amortizarea anuală (A) = " + a.toFixed(2) + " lei/an";
+        }
+    }
+
+    function calcWmg() {
+        let q0 = parseFloat(document.getElementById('q0').value);
+        let q1 = parseFloat(document.getElementById('q1').value);
+        let l0 = parseFloat(document.getElementById('l0').value);
+        let l1 = parseFloat(document.getElementById('l1').value);
+        let wmg = (q1 - q0) / (l1 - l0);
+        document.getElementById('resWmg').innerText = "Wmg = " + wmg.toFixed(2) + " (Spor producție per nou angajat)";
+    }
+
+    function calcPrag() {
+        let p = parseFloat(document.getElementById('p_v').value);
+        let cf = parseFloat(document.getElementById('cf_r').value);
+        let cvu = parseFloat(document.getElementById('cv_u').value);
+        // Prag: Q = CF / (P - CVM)
+        let q_prag = cf / (p - cvu);
+        document.getElementById('resPrag').innerText = "Prag Rentabilitate Q = " + q_prag.toFixed(2) + " unități";
+    }
+</script>
+
+</body>
+</html>
